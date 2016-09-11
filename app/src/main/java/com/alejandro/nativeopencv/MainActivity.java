@@ -1,4 +1,4 @@
-package xsor.io.occlusion;
+package com.alejandro.nativeopencv;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

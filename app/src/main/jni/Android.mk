@@ -14,7 +14,7 @@ include ${OPENCVROOT}/sdk/native/jni/OpenCV.mk
 
 
 
-LOCAL_SRC_FILES := xsor_io_occlusion_NativeClass.cpp
+LOCAL_SRC_FILES := com_alejandro_nativeopencv_NativeClass.cpp
 LOCAL_LDLIBS += -llog
 LOCAL_MODULE := MyLib
 

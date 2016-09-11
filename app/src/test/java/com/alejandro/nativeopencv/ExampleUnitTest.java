@@ -1,4 +1,4 @@
-package xsor.io.occlusion;
+package com.alejandro.nativeopencv;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package xsor.io.occlusion;
+package com.alejandro.nativeopencv;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
