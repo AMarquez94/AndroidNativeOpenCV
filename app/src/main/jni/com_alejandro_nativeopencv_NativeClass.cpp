@@ -8,5 +8,5 @@ JNIEXPORT jstring JNICALL Java_com_alejandro_nativeopencv_NativeClass_getStringF
 
     Mat image;
 
-    return env->NewStringUTF("Hola Tontiña");
+    return env->NewStringUTF("Hello");
 }
