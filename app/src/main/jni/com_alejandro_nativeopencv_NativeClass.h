@@ -9,11 +9,11 @@ extern "C" {
 #endif
 /*
  * Class:     com_alejandro_nativeopencv_NativeClass
- * Method:    getStringFromNative
- * Signature: ()Ljava/lang/String;
+ * Method:    ProcImage
+ * Signature: (II[B[I)Z
  */
-JNIEXPORT jstring JNICALL Java_com_alejandro_nativeopencv_NativeClass_getStringFromNative
-  (JNIEnv *, jclass);
+JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_ProcImage
+  (JNIEnv *, jclass, jint, jint, jbyteArray, jintArray);
 
 #ifdef __cplusplus
 }
