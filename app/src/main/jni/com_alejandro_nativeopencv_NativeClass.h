@@ -15,6 +15,22 @@ extern "C" {
 JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_ProcImage
   (JNIEnv *, jclass, jint, jint, jbyteArray, jintArray);
 
+/*
+ * Class:     com_alejandro_nativeopencv_NativeClass
+ * Method:    loadImages
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_loadImages
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_alejandro_nativeopencv_NativeClass
+ * Method:    FindObjects
+ * Signature: (II[B[I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_FindObjects
+  (JNIEnv *, jclass, jint, jint, jbyteArray, jintArray);
+
 #ifdef __cplusplus
 }
 #endif

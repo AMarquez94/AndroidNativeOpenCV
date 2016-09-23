@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file:///media/alejandro/DATA-Ubuntu/alejandro/AndroidStudioProjects/AndroidNativeOpenCV/AndroidNativeOpenCV.iml" filepath="/media/alejandro/DATA-Ubuntu/alejandro/AndroidStudioProjects/AndroidNativeOpenCV/AndroidNativeOpenCV.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file:///media/alejandro/DATA-Ubuntu/alejandro/AndroidStudioProjects/AndroidNativeOpenCV/app/app.iml" filepath="/media/alejandro/DATA-Ubuntu/alejandro/AndroidStudioProjects/AndroidNativeOpenCV/app/app.iml" />
     </modules>
   </component>
 </project>

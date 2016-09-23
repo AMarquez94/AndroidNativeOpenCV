@@ -99,18 +99,13 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
         mCamera = null;
     }
 
-    static
-    {
-        System.loadLibrary("ProcImage");
-    }
-
     private Runnable DoImageProcessing = new Runnable()
     {
         public void run()
         {
             Log.i("MyImageProcessing", "DoImageProcessing():");
             bProcessing = true;
-            NativeClass.ProcImage(PreviewSizeWidth, PreviewSizeHeight, FrameData, pixels);
+            NativeClass.FindObjects(PreviewSizeWidth, PreviewSizeHeight, FrameData, pixels);
 
             bitmap.setPixels(pixels, 0, PreviewSizeWidth, 0, 0, PreviewSizeWidth, PreviewSizeHeight);
             MyCameraPreview.setImageBitmap(bitmap);

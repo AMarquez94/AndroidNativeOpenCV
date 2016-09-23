@@ -1,9 +1,9 @@
 package com.alejandro.nativeopencv;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup.LayoutParams;
@@ -17,8 +17,8 @@ public class CameraActivity extends AppCompatActivity
     private CameraPreview camPreview;
     private ImageView MyCameraPreview = null;
     private FrameLayout mainLayout;
-    private int PreviewSizeWidth = 640;
-    private int PreviewSizeHeight= 480;
+    private int previewSizeWidth;
+    private int previewSizeHeight;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -42,14 +42,23 @@ public class CameraActivity extends AppCompatActivity
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        camPreview = new CameraPreview(metrics.widthPixels, metrics.heightPixels, MyCameraPreview);
+        this.previewSizeHeight = metrics.heightPixels;
+        this.previewSizeWidth = metrics.widthPixels;
+
+        Log.d("TAMAÑO", "Tamaño horizontal " + previewSizeWidth);
+        Log.d("TAMAÑO", "Tamaño vertical " + previewSizeHeight);
+
+        this.previewSizeHeight = 480;
+        this.previewSizeWidth = 640;
+
+        camPreview = new CameraPreview(previewSizeWidth, previewSizeHeight, MyCameraPreview);
 
         camHolder.addCallback(camPreview);
         camHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
 
         mainLayout = (FrameLayout) findViewById(R.id.frameLayout1);
-        mainLayout.addView(camView, new LayoutParams(metrics.widthPixels,  metrics.heightPixels));
+        mainLayout.addView(camView, new LayoutParams(1, 1));
         mainLayout.addView(MyCameraPreview, new LayoutParams(metrics.widthPixels,  metrics.heightPixels));
     }
     protected void onPause()

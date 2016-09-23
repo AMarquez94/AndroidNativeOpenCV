@@ -11,6 +11,11 @@ public class MainActivity extends AppCompatActivity {
 
     private Button mButton;
 
+    static {
+        System.loadLibrary("gnustl_shared");
+        System.loadLibrary("ProcImage");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,9 +31,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        NativeClass.loadImages();
     }
 
-    static {
-        System.loadLibrary("gnustl_shared");
-    }
 }

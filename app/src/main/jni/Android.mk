@@ -14,9 +14,8 @@ include ${OPENCVROOT}/sdk/native/jni/OpenCV.mk
 
 
 
-LOCAL_SRC_FILES := alien.cpp
+LOCAL_MODULE := ProcImage
 LOCAL_SRC_FILES := com_alejandro_nativeopencv_NativeClass.cpp
 LOCAL_LDLIBS += -llog
-LOCAL_MODULE := ProcImage
 
 include $(BUILD_SHARED_LIBRARY)
