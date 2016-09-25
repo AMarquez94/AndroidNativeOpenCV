@@ -17,10 +17,10 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_ProcImage
 
 /*
  * Class:     com_alejandro_nativeopencv_NativeClass
- * Method:    loadImages
+ * Method:    initRecognizer
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_loadImages
+JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_initRecognizer
   (JNIEnv *, jclass);
 
 /*

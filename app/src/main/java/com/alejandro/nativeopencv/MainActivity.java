@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        NativeClass.loadImages();
+        NativeClass.initRecognizer();
     }
 
 }

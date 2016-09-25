@@ -3,13 +3,19 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc_c.h>
 #include <opencv2/highgui/highgui.hpp>
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
 #include <alien.cpp>
 #include <features.cpp>
 
 using namespace std;
 using namespace cv;
 
-Mat image;
+Ptr<ORB> detector;
+vector<KeyPoint> keypoints_object;
+Mat descriptors_object;
+Ptr<DescriptorMatcher> matcher;
+vector<Point2f> obj_corners(4);
 
 JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_ProcImage
   (JNIEnv * env, jclass clazz, jint width, jint height, jbyteArray yuv, jintArray bgra){
@@ -52,9 +58,16 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_ProcImage
 }
 
 
-JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_loadImages
+JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_initRecognizer
         (JNIEnv * env, jclass clazz){
-    image = imread("/storage/sdcard1/TFG/Fotos/caja.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+    detector = ORB::create();
+    Mat image = imread("/storage/sdcard1/TFG/Fotos/caja.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+    detector->detectAndCompute( image, Mat(), keypoints_object, descriptors_object );
+    matcher = DescriptorMatcher::create("BruteForce-Hamming");
+    obj_corners[0] = cvPoint(0,0);
+    obj_corners[1] = cvPoint(image.cols,0);
+    obj_corners[2] = cvPoint(image.cols, image.rows);
+    obj_corners[3] = cvPoint(0, image.rows);
     return true;
 }
 
@@ -87,7 +100,7 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_FindObjec
     // Hace el procesamiento de la imagen.
 //    displayedFrame = mgray;
     //alien(mbgr, displayedFrame, 1);
-    features(mgray, mbgr, displayedFrame, image);
+    features(mgray, mbgr, displayedFrame, detector, matcher, keypoints_object, descriptors_object, obj_corners);
 
     // Pasa de BGR (formato estandar) a BGRA (formato Android)
     cvtColor(displayedFrame, mbgra, CV_BGR2BGRA);
