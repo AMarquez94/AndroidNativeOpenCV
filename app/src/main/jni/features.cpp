@@ -12,22 +12,28 @@
 using namespace std;
 using namespace cv;
 
-void features(Mat imgGray, Mat imgColor, Mat dst, Mat object);
+void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<DescriptorMatcher> matcher,
+              vector<KeyPoint> keypoints_object, Mat descriptors_object, vector<Point2f> obj_corners);
+
+bool isConvex(vector<Point2f> scene_corners);
 
 /**
  * imgGray : camera image in grayscale mode
  * imgColor : camera image in bgr mode
  * dst: image to be displayed in the phone
- * object: image of the object to recognize in grayscale mode
+ * detector: feature detector for the images
+ * matcher: matcher between two images' feature points
+ * keypoints_object: keypoints of the object to recognize
+ * descriptors_object: descriptor of the object to recognize
+ * obj_corners: image corners of the object to recognize
  */
-void features(Mat imgGray, Mat imgColor, Mat dst, Mat object){
+void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<DescriptorMatcher> matcher,
+              vector<KeyPoint> keypoints_object, Mat descriptors_object, vector<Point2f> obj_corners){
 
     //-- Step 1: Detect the keypoints using SURF Detector
     int minHessian = 400;
-    Ptr<ORB> detector = ORB::create();
-    vector<KeyPoint> keypoints_object, keypoints_scene;
-    Mat descriptors_object, descriptors_scene;
-    detector->detectAndCompute( object, Mat(), keypoints_object, descriptors_object );
+    vector<KeyPoint> keypoints_scene;
+    Mat descriptors_scene;
     detector->detectAndCompute( imgGray, Mat(), keypoints_scene, descriptors_scene );
 
 //    __android_log_print(ANDROID_LOG_DEBUG, "SIZE OBJECT", "keypoints %d", keypoints_object.size());
@@ -36,7 +42,6 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Mat object){
     vector< vector<DMatch> > matches;
     vector<KeyPoint> matched_object, matched_scene;
     vector<Point2f> obj, scene;
-    Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create("BruteForce-Hamming");
 
     //Peta si no se hace la comprobacion
     if(keypoints_object.size() != 0 && keypoints_scene.size() != 0){
@@ -44,7 +49,7 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Mat object){
     }
 
     for(unsigned i = 0; i < matches.size(); i++){
-        if(matches[i][0].distance < 0.8*matches[i][1].distance){
+        if(matches[i][0].distance < 0.7*matches[i][1].distance){
             matched_object.push_back(keypoints_object[matches[i][0].queryIdx]);
             matched_scene.push_back(keypoints_scene[matches[i][0].trainIdx]);
             obj.push_back(keypoints_object[matches[i][0].queryIdx].pt);
@@ -61,96 +66,53 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Mat object){
 
         if(!H.empty()){
             //Corners Object
-            vector<Point2f> obj_corners(4);
-            obj_corners[0] = cvPoint(0,0);
-            obj_corners[1] = cvPoint(object.cols,0);
-            obj_corners[2] = cvPoint(object.cols, object.rows);
-            obj_corners[3] = cvPoint(0, object.rows);
-
             vector<Point2f> scene_corners(4);
 
             perspectiveTransform(obj_corners, scene_corners, H);
 
-            line(imgColor, scene_corners[0], scene_corners[1], Scalar(0,255,0), 4);
-            line(imgColor, scene_corners[1], scene_corners[2], Scalar(0,255,0), 4);
-            line(imgColor, scene_corners[2], scene_corners[3], Scalar(0,255,0), 4);
-            line(imgColor, scene_corners[3], scene_corners[0], Scalar(0,255,0), 4);
+            /* Check if convex or complex */
+            Scalar colour;
+            if(isConvex(scene_corners)){
+                colour = Scalar(0,255,0);
+            } else{
+                colour = Scalar(0,0,255);
+            }
+
+            line(imgColor, scene_corners[0], scene_corners[1], colour, 4);
+            line(imgColor, scene_corners[1], scene_corners[2], colour, 4);
+            line(imgColor, scene_corners[2], scene_corners[3], colour, 4);
+            line(imgColor, scene_corners[3], scene_corners[0], colour, 4);
         }
     }
 
     //-- Draw keypoints
     drawKeypoints( imgColor, matched_scene, dst, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
 
+}
 
+bool isConvex(vector <Point2f> scene_corners){
 
+    bool sign = false;
+    bool convex = true;
 
+    int i = 0;
+    while(i < 4 && convex){
+        float dx1 = scene_corners[(i+2)%4].x - scene_corners[(i+1)%4].x;
+        float dy1 = scene_corners[(i+2)%4].y - scene_corners[(i+1)%4].y;
+        float dx2 = scene_corners[i].x - scene_corners[(i+1)%4].x;
+        float dy2 = scene_corners[i].y - scene_corners[(i+1)%4].y;
+        float z = dx1*dy2 - dy1*dx2;
+        if(i == 0){
+            sign = z > 0;
+        } else{
+            if( sign != (z>0)){
+                convex = false;
+            }
+        }
+        i++;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    //-- Step 1: Detect the keypoints using SURF Detector
-//    int minHessian = 400;
-//    Ptr<ORB> detector = ORB::create(minHessian);
-//    vector<KeyPoint> keypoints_object, keypoints_scene;
-//    Mat descriptors_object, descriptors_scene;
-//    detector->detectAndCompute( imgGray, Mat(), keypoints_scene, descriptors_scene );
-//    detector->detectAndCompute( object, Mat(), keypoints_object, descriptors_object );
-//
-////    __android_log_print(ANDROID_LOG_DEBUG, "SIZE OBJECT", "keypoints %d", keypoints_object.size());
-////    __android_log_print(ANDROID_LOG_DEBUG, "SIZE SCENE", "keypoints %d", keypoints_scene.size());
-//
-//    FlannBasedMatcher matcher(/*new flann::LshIndexParams(12,20,2)*/);
-//    vector< DMatch > matches;
-//    matcher.match(descriptors_object, descriptors_scene, matches);
-//
-////    __android_log_print(ANDROID_LOG_DEBUG, "SIZE MATCHES", "matches %d", matches.size());
-//
-//    double max_dist = 0; double min_dist = 100;
-//    //-- Quick calculation of max and min distances between keypoints
-//    for( int i = 0; i < descriptors_object.rows; i++ )
-//    { double dist = matches[i].distance;
-//        if( dist < min_dist ) min_dist = dist;
-//        if( dist > max_dist ) max_dist = dist;
-//    }
-//
-////    __android_log_print(ANDROID_LOG_DEBUG, "MIN DIST", "minima distancia %f", min_dist);
-//
-//    vector<DMatch> good_matches;
-//    for(int i = 0; i < descriptors_object.rows; i++){
-//        if(matches[i].distance < 2*min_dist){
-//            good_matches.push_back(matches[i]);
-//        }
-//    }
-//
-//    __android_log_print(ANDROID_LOG_DEBUG, "SIZE", "keypoints %d", good_matches.size());
-//
-//    vector<KeyPoint> obj;
-//    vector<KeyPoint> scene;
-//
-//    for(size_t i = 0; i < good_matches.size(); i++){
-//        scene.push_back(keypoints_scene[good_matches[i].trainIdx]);
-//    }
-//
-//
-//    //-- Draw keypoints
-//    drawKeypoints( imgColor, scene, dst, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
-
+    return convex;
 }
 
 
