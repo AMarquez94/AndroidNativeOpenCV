@@ -16,6 +16,7 @@ Ptr<DescriptorMatcher> matcher;
 vector < vector<KeyPoint> > keypoints_objects;
 vector < Mat > descriptors_objects;
 vector < vector<Point2f> > objs_corners;
+vector < String > obj_names;
 
 JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_ProcImage
   (JNIEnv * env, jclass clazz, jint width, jint height, jbyteArray yuv, jintArray bgra){
@@ -63,26 +64,21 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_initRecog
     detector = ORB::create();
     matcher = DescriptorMatcher::create("BruteForce-Hamming");
 
-    for(int i = 0; i < 2; i ++){
+    obj_names.push_back("teclado");
+    obj_names.push_back("carpeta");
+
+    for(int i = 0; i < obj_names.size(); i ++){
         keypoints_objects.push_back(vector <KeyPoint>());
         descriptors_objects.push_back(Mat());
         objs_corners.push_back(vector <Point2f>(4));
+
+        Mat image = imread("/storage/sdcard1/TFG/Fotos/" + obj_names[i] + ".jpg", CV_LOAD_IMAGE_GRAYSCALE);
+        detector->detectAndCompute( image, Mat(), keypoints_objects[i], descriptors_objects[i] );
+        objs_corners[i][0] = cvPoint(0,0);
+        objs_corners[i][1] = cvPoint(image.cols,0);
+        objs_corners[i][2] = cvPoint(image.cols, image.rows);
+        objs_corners[i][3] = cvPoint(0, image.rows);
     }
-
-
-    Mat image = imread("/storage/sdcard1/TFG/Fotos/teclado.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-    detector->detectAndCompute( image, Mat(), keypoints_objects[0], descriptors_objects[0] );
-    objs_corners[0][0] = cvPoint(0,0);
-    objs_corners[0][1] = cvPoint(image.cols,0);
-    objs_corners[0][2] = cvPoint(image.cols, image.rows);
-    objs_corners[0][3] = cvPoint(0, image.rows);
-
-    image = imread("/storage/sdcard1/TFG/Fotos/carpeta.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-    detector->detectAndCompute( image, Mat(), keypoints_objects[1], descriptors_objects[1] );
-    objs_corners[1][0] = cvPoint(0,0);
-    objs_corners[1][1] = cvPoint(image.cols,0);
-    objs_corners[1][2] = cvPoint(image.cols, image.rows);
-    objs_corners[1][3] = cvPoint(0, image.rows);
     return true;
 }
 
@@ -115,7 +111,7 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_FindObjec
     // Hace el procesamiento de la imagen.
 //    displayedFrame = mgray;
     //alien(mbgr, displayedFrame, 1);
-    features(mgray, mbgr, displayedFrame, detector, matcher, keypoints_objects, descriptors_objects, objs_corners);
+    features(mgray, mbgr, displayedFrame, detector, matcher, keypoints_objects, descriptors_objects, objs_corners, obj_names);
 
     // Pasa de BGR (formato estandar) a BGRA (formato Android)
     cvtColor(displayedFrame, mbgra, CV_BGR2BGRA);

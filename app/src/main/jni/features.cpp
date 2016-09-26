@@ -32,7 +32,8 @@ bool isConvex(vector<Point2f> scene_corners);
 void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<DescriptorMatcher> matcher,
               vector < vector<KeyPoint> > keypoints_objects,
               vector < Mat > descriptors_objects ,
-              vector < vector<Point2f> > objs_corners){
+              vector < vector<Point2f> > objs_corners,
+              vector < String > obj_names){
 
     //-- Step 1: Detect the keypoints using SURF Detector
     int minHessian = 400;
@@ -97,6 +98,8 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<Descrip
 
     __android_log_print(ANDROID_LOG_DEBUG, "BEST_MATCH", "best match %d", best_match);
 
+    bool isMatch = false;
+
     if(best_match!=-1 && matched_scene[best_match].size() >= 4){
 
         //Homography matrix
@@ -112,6 +115,7 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<Descrip
             Scalar colour;
             if(isConvex(scene_corners)){
                 colour = Scalar(0,255,0);
+                isMatch = true;
             } else{
                 colour = Scalar(0,0,255);
             }
@@ -123,9 +127,17 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<Descrip
         }
     }
 
-    //-- Draw keypoints
-    if(best_match != -1){
+    if(isMatch){
+        //-- Draw keypoints
         drawKeypoints( imgColor, matched_scene[best_match], dst, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
+
+
+        //-- Write object name
+        Size textsize = getTextSize(obj_names[best_match], FONT_HERSHEY_COMPLEX, 1, 2, 0);
+//        Point org((640 - textsize.width)/2, (480 - textsize.height)/2);
+        Point org((640 - textsize.width - 20), textsize.height + 20);
+        putText( dst, obj_names[best_match], org, FONT_HERSHEY_COMPLEX, 1,
+                 Scalar(0, 0, 255), 2);
     }
     else{
         imgColor.copyTo(dst);
