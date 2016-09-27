@@ -5,8 +5,10 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
+#include <android/log.h>
 #include <alien.cpp>
 #include <features.cpp>
+#include "structures/headers/Object.h"
 
 using namespace std;
 using namespace cv;
@@ -61,6 +63,9 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_ProcImage
 
 JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_initRecognizer
         (JNIEnv * env, jclass clazz){
+
+    __android_log_print(ANDROID_LOG_DEBUG, "HOLA", "Peta");
+
     detector = ORB::create();
     matcher = DescriptorMatcher::create("BruteForce-Hamming");
 

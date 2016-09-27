@@ -31,7 +31,7 @@ bool isConvex(vector<Point2f> scene_corners);
  */
 void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<DescriptorMatcher> matcher,
               vector < vector<KeyPoint> > keypoints_objects,
-              vector < Mat > descriptors_objects ,
+              vector < Mat > descriptors_objects,
               vector < vector<Point2f> > objs_corners,
               vector < String > obj_names){
 
@@ -56,11 +56,11 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<Descrip
         if(keypoints_objects[i].size() != 0 && keypoints_scene.size() != 0) {
 
 //            __android_log_print(ANDROID_LOG_DEBUG, "BUCLE", "HABEMUS IMAGE");
-
+            // initial NN matching
             matcher->knnMatch(descriptors_objects[i], descriptors_scene, matches[i], 2);
 
 //            __android_log_print(ANDROID_LOG_DEBUG, "MATCHES", "matches %d", matches[i].size());
-
+            // filter matches with dnn1 < 0.7 dnn2
             for (unsigned j = 0; j < matches[i].size(); j++) {
                 if (matches[i][j][0].distance < 0.7 * matches[i][j][1].distance) {
 //                    __android_log_print(ANDROID_LOG_DEBUG, "MATCHES", "good match");
