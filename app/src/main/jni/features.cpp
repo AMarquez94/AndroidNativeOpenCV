@@ -17,7 +17,7 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<Descrip
               vector < Mat > descriptors_objects ,
               vector < vector<Point2f> > objs_corners);
 
-bool isConvex(vector<Point2f> scene_corners);
+//bool isConvex(vector<Point2f> scene_corners);
 
 /**
  * imgGray : camera image in grayscale mode
@@ -113,12 +113,12 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<Descrip
 
             /* Check if convex or concav */
             Scalar colour;
-            if(isConvex(scene_corners)){
-                colour = Scalar(0,255,0);
-                isMatch = true;
-            } else{
-                colour = Scalar(0,0,255);
-            }
+//            if(isConvex(scene_corners)){
+//                colour = Scalar(0,255,0);
+//                isMatch = true;
+//            } else{
+//                colour = Scalar(0,0,255);
+//            }
 
             line(imgColor, scene_corners[0], scene_corners[1], colour, 4);
             line(imgColor, scene_corners[1], scene_corners[2], colour, 4);
@@ -144,31 +144,31 @@ void features(Mat imgGray, Mat imgColor, Mat dst, Ptr<ORB> detector, Ptr<Descrip
     }
 }
 
-/**
- *
- * Return true if the cuadrilateral formed by the scene_corners is convex
- */
-bool isConvex(vector <Point2f> scene_corners){
-
-    bool sign = false;
-    bool convex = true;
-
-    int i = 0;
-    while(i < 4 && convex){
-        float dx1 = scene_corners[(i+2)%4].x - scene_corners[(i+1)%4].x;
-        float dy1 = scene_corners[(i+2)%4].y - scene_corners[(i+1)%4].y;
-        float dx2 = scene_corners[i].x - scene_corners[(i+1)%4].x;
-        float dy2 = scene_corners[i].y - scene_corners[(i+1)%4].y;
-        float z = dx1*dy2 - dy1*dx2;
-        if(i == 0){
-            sign = z > 0;
-        } else{
-            if( sign != (z>0)){
-                convex = false;
-            }
-        }
-        i++;
-    }
-
-    return convex;
-}
+///**
+// *
+// * Return true if the cuadrilateral formed by the scene_corners is convex
+// */
+//bool isConvex(vector <Point2f> scene_corners){
+//
+//    bool sign = false;
+//    bool convex = true;
+//
+//    int i = 0;
+//    while(i < 4 && convex){
+//        float dx1 = scene_corners[(i+2)%4].x - scene_corners[(i+1)%4].x;
+//        float dy1 = scene_corners[(i+2)%4].y - scene_corners[(i+1)%4].y;
+//        float dx2 = scene_corners[i].x - scene_corners[(i+1)%4].x;
+//        float dy2 = scene_corners[i].y - scene_corners[(i+1)%4].y;
+//        float z = dx1*dy2 - dy1*dx2;
+//        if(i == 0){
+//            sign = z > 0;
+//        } else{
+//            if( sign != (z>0)){
+//                convex = false;
+//            }
+//        }
+//        i++;
+//    }
+//
+//    return convex;
+//}

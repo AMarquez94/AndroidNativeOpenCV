@@ -21,25 +21,29 @@ class Object {
 
         /* Atribs */
         String name;
-        vector < vector<KeyPoint> > keypoints;
-        vector <Mat> descriptors;
-        vector < vector<Point2f> > corners;
-        vector < String > views_name;
+        vector < vector<KeyPoint> > viewsKeyPoints;
+        vector <Mat> viewsDescriptors;
+        vector < vector<Point2f> > viewsCorners;
+        vector < String > viewsNames;
         bool easy;
+        bool null;
 
     public:
 
         /* Constructor */
-        Object(String name, vector < vector<KeyPoint> > keypoints, vector <Mat> descriptors,
-           vector < vector<Point2f> > corners, bool easy);
+        Object(bool null);
+        Object(String name, vector < vector<KeyPoint> > viewsKeyPoints, vector <Mat> viewsDescriptors,
+           vector < vector<Point2f> > viewsCorners, vector < String > viewsNames, bool easy);
 
         /* Methods */
         String getName();
-        vector < vector<KeyPoint> > getKeypoints();
-        vector < Mat > getDescriptors();
-        vector < vector <Point2f> > getCorners();
+        vector < vector<KeyPoint> > getViewsKeyPoints();
+        vector < Mat > getViewsDescriptors();
+        vector < vector <Point2f> > getViewsCorners();
+        vector < String > getViewsNames();
         bool isEasy();
-
+        bool isNull();
+        int getNumberOfViews();
 };
 
 

@@ -18,28 +18,30 @@ using namespace cv;
 class Recognizer {
 
 private:
-    Ptr<FeatureDetector> descriptor;
-    Ptr<FeatureExtractor> extractor;
+    Ptr<FeatureDetector> detector;
+    Ptr<DescriptorExtractor> extractor;
     Ptr<DescriptorMatcher> matcher;
     vector<Object> objects;
+    int matcherDistanceFilter;
 public:
 
     /* Constructors */
-    Recognizer(String descriptor, String extractor, String matcher);
-    Recognizer(String descriptor, String extractor, String matcher, vector<Object> objects);
-    Recognizer(String descriptor, vector<int> descriptorParams, String extractor,
+    Recognizer();
+    Recognizer(String detector, String extractor, String matcher);
+    Recognizer(String detector, String extractor, String matcher, vector<Object> objects);
+    Recognizer(String detector, vector<int> detectorParams, String extractor,
                vector<int> extractorParams, String matcher, vector<int> matcherParams);
-    Recognizer(String descriptor, vector<int> descriptorParams, String extractor,
+    Recognizer(String detector, vector<int> detectorParams, String extractor,
                vector<int> extractorParams, String matcher, vector<int> matcherParams,
                vector<Object> objects);
 
     /* Getters */
     Ptr<FeatureDetector> getDescriptor();
-    Ptr<FeatureExtractor> getExtractor();
+    Ptr<DescriptorExtractor> getExtractor();
     Ptr<DescriptorMatcher> getMatcher();
 
     /* Setters */
-    void setDescriptor(String descriptor);
+    void setDescriptor(String detector);
     void setExtractor(String extractor);
     void setMatcher(String matcher);
 
