@@ -22,7 +22,7 @@ private:
     Ptr<DescriptorExtractor> extractor;
     Ptr<DescriptorMatcher> matcher;
     vector<Object> objects;
-    int matcherDistanceFilter;
+    double matcherDistanceFilter;
 public:
 
     /* Constructors */

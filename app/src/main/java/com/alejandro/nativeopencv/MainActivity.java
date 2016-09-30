@@ -48,8 +48,10 @@ public class MainActivity extends AppCompatActivity{
         if (Build.VERSION.SDK_INT >= 23) {
             if ((checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) &&
-                    checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED){
+                    (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) &&
+                    (checkSelfPermission(Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED)){
                 Log.v(TAG,"Permission is granted");
                 return true;
             } else {
@@ -57,7 +59,8 @@ public class MainActivity extends AppCompatActivity{
                 Log.v(TAG,"Permission is revoked");
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.CAMERA,}, 1);
                 return false;
             }
         }
@@ -71,9 +74,11 @@ public class MainActivity extends AppCompatActivity{
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults[0]== PackageManager.PERMISSION_GRANTED &&
-                grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                grantResults[1] == PackageManager.PERMISSION_GRANTED &&
+                grantResults[2] == PackageManager.PERMISSION_GRANTED){
             Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
             Log.v(TAG,"Permission: "+permissions[1]+ "was "+grantResults[1]);
+            Log.v(TAG,"Permission: "+permissions[2]+ "was "+grantResults[2]);
             //resume tasks needing this permission
             NativeClass.initRecognizer();
         }

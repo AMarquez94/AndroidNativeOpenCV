@@ -15,12 +15,15 @@
 using namespace std;
 using namespace cv;
 
+/* TODO: delete images */
+
 class Object {
 
     private:
 
         /* Atribs */
         String name;
+        vector <Mat> viewsImages;
         vector < vector<KeyPoint> > viewsKeyPoints;
         vector <Mat> viewsDescriptors;
         vector < vector<Point2f> > viewsCorners;
@@ -32,11 +35,12 @@ class Object {
 
         /* Constructor */
         Object(bool null);
-        Object(String name, vector < vector<KeyPoint> > viewsKeyPoints, vector <Mat> viewsDescriptors,
+        Object(String name, vector <Mat> viewsImages, vector < vector<KeyPoint> > viewsKeyPoints, vector <Mat> viewsDescriptors,
            vector < vector<Point2f> > viewsCorners, vector < String > viewsNames, bool easy);
 
         /* Methods */
         String getName();
+        vector <Mat> getViewsImages();
         vector < vector<KeyPoint> > getViewsKeyPoints();
         vector < Mat > getViewsDescriptors();
         vector < vector <Point2f> > getViewsCorners();

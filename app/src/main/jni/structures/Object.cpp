@@ -11,9 +11,10 @@ Object::Object(bool null) {
     this->null = null;
 }
 
-Object::Object(String name, vector < vector<KeyPoint> > viewsKeyPoints, vector <Mat> viewsDescriptors,
+Object::Object(String name, vector<Mat> viewsImages, vector < vector<KeyPoint> > viewsKeyPoints, vector <Mat> viewsDescriptors,
                vector < vector<Point2f> > viewsCorners, vector <String> viewsName, bool easy){
     this->name = name;
+    this->viewsImages = viewsImages;
     this->viewsKeyPoints = viewsKeyPoints;
     this->viewsDescriptors = viewsDescriptors;
     this->viewsCorners = viewsCorners;
@@ -26,6 +27,10 @@ Object::Object(String name, vector < vector<KeyPoint> > viewsKeyPoints, vector <
 
 String Object::getName(){
     return this->name;
+}
+
+vector < Mat > Object::getViewsImages() {
+    return this->viewsImages;
 }
 
 vector < vector<KeyPoint> > Object::getViewsKeyPoints(){

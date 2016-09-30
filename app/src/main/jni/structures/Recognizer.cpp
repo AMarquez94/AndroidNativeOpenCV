@@ -108,16 +108,13 @@ void Recognizer::setMatcher(String matcher) {
 }
 
 Object Recognizer::createObject(String path, bool add) {
-    __android_log_print(ANDROID_LOG_DEBUG,"SHU","entramos");
-    __android_log_print(ANDROID_LOG_DEBUG,"path","%s",(path + "/info.txt").c_str());
     ifstream file;
     file.open((path + "/info.txt").c_str());
     if (!file.is_open()){
-        __android_log_print(ANDROID_LOG_DEBUG,"TRISTE","mucho");
         return Object(true);
     } else{
-        __android_log_print(ANDROID_LOG_DEBUG,"ALEGRE","bien");
         String name;
+        vector <Mat> images;
         vector < vector<KeyPoint> > keypoints;
         vector <Mat> descriptors;
         vector < vector<Point2f> > corners;
@@ -143,11 +140,19 @@ Object Recognizer::createObject(String path, bool add) {
             } else if(i%2 == 0){
 
                 /* Object image view*/
+                images.push_back(Mat());
                 keypoints.push_back(vector <KeyPoint>());
                 descriptors.push_back(Mat());
                 corners.push_back(vector <Point2f>(4));
 
                 Mat image = imread(path + "/" + word, CV_LOAD_IMAGE_GRAYSCALE);
+//                if(!image.data){
+//                    __android_log_print(ANDROID_LOG_DEBUG, "TRISTE", "BUAAAAAAAAAAAAAAAAAH");
+//                } else{
+//                    __android_log_print(ANDROID_LOG_DEBUG, "HAY DATA", "ZI");
+//                }
+//                __android_log_print(ANDROID_LOG_DEBUG, "EASY", "%s", (path + "/" + word).c_str());
+                images[(i/2)-1] = image;
                 this->detector->detect(image, keypoints[(i/2)-1]);
                 this->extractor->compute(image, keypoints[(i/2)-1], descriptors[(i/2)-1]);
                 corners[(i/2)-1][0] = cvPoint(0,0);
@@ -166,7 +171,7 @@ Object Recognizer::createObject(String path, bool add) {
 
             i++;
         }
-        Object obj = Object(name, keypoints, descriptors, corners, viewNames, easy);
+        Object obj = Object(name, images, keypoints, descriptors, corners, viewNames, easy);
 
         if(add){
             this->objects.push_back(obj);
@@ -181,6 +186,8 @@ Object Recognizer::createObject(String path, bool add) {
 String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dstImg){
 
 
+    __android_log_print(ANDROID_LOG_DEBUG,"ENTRADA", "entramos");
+
 
     /* Extract features from the sceneImage */
     vector<KeyPoint> keypointsScene;
@@ -188,13 +195,13 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
     this->detector->detect(sceneImgGray, keypointsScene);
     this->extractor->compute(sceneImgGray, keypointsScene, descriptorsScene);
 
+    __android_log_print(ANDROID_LOG_DEBUG,"Extractor", "extraemos");
+
     /* Extract the matches between the cameraImage and all the objects in the object list */
 
     /* Data structures */
-    vector < vector< vector<KeyPoint> > >matchedObjects(this->objects.size()),
-            matchedScene(this->objects.size());
-    vector < vector< vector<Point2f> > >objs(this->objects.size()),
-            scene(this->objects.size());
+    vector < vector< vector<KeyPoint> > >matchedObjects, matchedScene;
+    vector < vector< vector<Point2f> > >objs, scene;
     vector < vector< vector< vector<DMatch> > > >matches(this->objects.size());
 
     int bestMatchObject = -1;   //Best object recognized
@@ -202,18 +209,17 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
     int numberOfMatches = 0;    //Maximum number of matches found
 
     if(keypointsScene.size() != 0){
-        for(int i = 0; i < this->objects.size(); i++){
 
+        for(int i = 0; i < this->objects.size(); i++){
             /* Iterating over objects */
 
             matchedObjects.push_back(vector < vector<KeyPoint> >(this->objects[i].getNumberOfViews()));
             matchedScene.push_back(vector < vector<KeyPoint> >(this->objects[i].getNumberOfViews()));
             objs.push_back(vector < vector<Point2f> >(this->objects[i].getNumberOfViews()));
             scene.push_back(vector < vector<Point2f> >(this->objects[i].getNumberOfViews()));
-            matches.push_back(vector < vector < vector<DMatch> > >(this->objects[i].getNumberOfViews()));
+            matches[i] = vector< vector < vector<DMatch> > >(this->objects[i].getNumberOfViews());
 
             for(int j = 0; j < this->objects[i].getNumberOfViews(); j++){
-
                 /* Iterating over object views */
 
                 if(this->objects[i].getViewsKeyPoints()[j].size() != 0){
@@ -226,8 +232,7 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
 
                         if(matches[i][j][k][0].distance < this->matcherDistanceFilter * matches[i][j][k][1].distance){
 
-                            /* Good match */
-
+                            /* Good match -> save matches points and info */
                             matchedObjects[i][j].push_back(this->objects[i].getViewsKeyPoints()[j][matches[i][j][k][0].queryIdx]);
                             matchedScene[i][j].push_back(keypointsScene[matches[i][j][k][0].trainIdx]);
                             objs[i][j].push_back(this->objects[i].getViewsKeyPoints()[j][matches[i][j][k][0].queryIdx].pt);
@@ -276,24 +281,28 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
         }
     }
 
+    String objectName;
+
     if(isMatch){
         //-- Draw keypoints
         drawKeypoints( sceneImgColour, matchedScene[bestMatchObject][bestMatchView], dstImg, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
 
-
-        //-- Write object name
-        Size textsize = getTextSize(this->objects[bestMatchObject].getName() + "_" +
-                                            this->objects[bestMatchObject].getViewsNames()[bestMatchView],
-                                    FONT_HERSHEY_COMPLEX, 1, 2, 0);
-
-        Point org((640 - textsize.width - 20), textsize.height + 20);
-        putText( dstImg, this->objects[bestMatchObject].getName() + "_" +
-                         this->objects[bestMatchObject].getViewsNames()[bestMatchView], org,
-                 FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 2);
+        objectName = this->objects[bestMatchObject].getName() + "_" +
+            this->objects[bestMatchObject].getViewsNames()[bestMatchView];
     }
     else{
+
+        /* No match */
         sceneImgColour.copyTo(dstImg);
+        objectName = "No object";
     }
+
+    /* Write object name */
+    Size textsize = getTextSize(objectName, FONT_HERSHEY_COMPLEX, 1, 2, 0);
+
+    Point org((640 - textsize.width - 20), textsize.height + 20);
+    putText( dstImg, objectName, org, FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 2);
+    return objectName;
 }
 
 /**
