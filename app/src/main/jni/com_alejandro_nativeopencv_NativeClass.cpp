@@ -66,14 +66,21 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_initRecog
     recognizer = Recognizer("ORB","ORB","BruteForce-Hamming");
 
     /* Adds objects */
-    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Carpeta", true);
-    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Cereales", true);
-    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Leche", true);
-    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Ariel", true);
-    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Cafe", true);
-    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Celta", true);
-    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Nocilla", true);
-    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Orlando", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Carpeta", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Cereales", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Asturiana", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Ariel", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Cafe", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Celta", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Nocilla", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Orlando", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Agua", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Ambar", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Licor43", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Manocao", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Nescafe", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Sal_Hacendado", true);
+    recognizer.createObject("/storage/emulated/0/TFG/BD/Tortitas_arroz", true);
 
     return true;
 }
