@@ -16,7 +16,8 @@ public class MainActivity extends AppCompatActivity{
 
     final String TAG = "MainActivity";
 
-    private Button mButton;
+    private Button mButtonCamera;
+    private Button mButtonTest;
 
     static {
         System.loadLibrary("gnustl_shared");
@@ -30,14 +31,23 @@ public class MainActivity extends AppCompatActivity{
 
         TextView tv = (TextView) findViewById(R.id.testTextView);
 
-        mButton = (Button)this.findViewById(R.id.camera_button);
-        mButton.setOnClickListener(new View.OnClickListener(){
+        mButtonCamera = (Button)this.findViewById(R.id.camera_button);
+        mButtonCamera.setOnClickListener(new View.OnClickListener(){
             public void onClick(View arg0){
 
                 Intent intent = new Intent(MainActivity.this, CameraActivity.class);
                 startActivity(intent);
             }
         });
+
+        mButtonTest = (Button)this.findViewById(R.id.test_button);
+        mButtonTest.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View arg0){
+
+                NativeClass.doTest();
+            }
+        });
+
 
         if(isStoragePermissionGranted()){
             NativeClass.initRecognizer();

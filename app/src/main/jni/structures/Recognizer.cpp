@@ -84,6 +84,10 @@ Ptr<DescriptorMatcher> Recognizer::getMatcher(){
     return this->getMatcher();
 }
 
+vector<Object> Recognizer::getObjects() {
+    return this->objects;
+}
+
 /* Setters */
 
 void Recognizer::setDescriptor(String detector) {
@@ -105,6 +109,10 @@ void Recognizer::setExtractor(String extractor) {
 void Recognizer::setMatcher(String matcher) {
     this->matcher = DescriptorMatcher::create(matcher);
     this->matcherDistanceFilter = 0.7;
+}
+
+void Recognizer::setObjects(vector <Object> objects) {
+    this->objects = objects;
 }
 
 Object Recognizer::createObject(String path, bool add) {
@@ -146,12 +154,6 @@ Object Recognizer::createObject(String path, bool add) {
                 corners.push_back(vector <Point2f>(4));
 
                 Mat image = imread(path + "/" + word, CV_LOAD_IMAGE_GRAYSCALE);
-//                if(!image.data){
-//                    __android_log_print(ANDROID_LOG_DEBUG, "TRISTE", "BUAAAAAAAAAAAAAAAAAH");
-//                } else{
-//                    __android_log_print(ANDROID_LOG_DEBUG, "HAY DATA", "ZI");
-//                }
-//                __android_log_print(ANDROID_LOG_DEBUG, "EASY", "%s", (path + "/" + word).c_str());
                 images[(i/2)-1] = image;
                 this->detector->detect(image, keypoints[(i/2)-1]);
                 this->extractor->compute(image, keypoints[(i/2)-1], descriptors[(i/2)-1]);
@@ -183,10 +185,25 @@ Object Recognizer::createObject(String path, bool add) {
     }
 }
 
+int Recognizer::getObjectIndex(String name) {
+    int i = 0;
+    bool found = false;
+    while(i < this->objects.size() && !found){
+        if(this->objects[i].getName() == name){
+            found = true;
+        } else{
+            i++;
+        }
+    }
+
+    if(!found){
+        return -1;
+    } else{
+        return i;
+    }
+}
+
 String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dstImg){
-
-
-    __android_log_print(ANDROID_LOG_DEBUG,"ENTRADA", "entramos");
 
 
     /* Extract features from the sceneImage */
@@ -194,8 +211,6 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
     Mat descriptorsScene;
     this->detector->detect(sceneImgGray, keypointsScene);
     this->extractor->compute(sceneImgGray, keypointsScene, descriptorsScene);
-
-    __android_log_print(ANDROID_LOG_DEBUG,"Extractor", "extraemos");
 
     /* Extract the matches between the cameraImage and all the objects in the object list */
 
@@ -287,8 +302,10 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
         //-- Draw keypoints
         drawKeypoints( sceneImgColour, matchedScene[bestMatchObject][bestMatchView], dstImg, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
 
-        objectName = this->objects[bestMatchObject].getName() + "_" +
-            this->objects[bestMatchObject].getViewsNames()[bestMatchView];
+//        objectName = this->objects[bestMatchObject].getName() + "_" +
+//            this->objects[bestMatchObject].getViewsNames()[bestMatchView];
+
+        objectName = this->objects[bestMatchObject].getName();
     }
     else{
 

@@ -39,14 +39,17 @@ public:
     Ptr<FeatureDetector> getDescriptor();
     Ptr<DescriptorExtractor> getExtractor();
     Ptr<DescriptorMatcher> getMatcher();
+    vector<Object> getObjects();
 
     /* Setters */
     void setDescriptor(String detector);
     void setExtractor(String extractor);
     void setMatcher(String matcher);
+    void setObjects(vector<Object> objects);
 
     /* Methods */
     Object createObject(String path, bool add);
+    int getObjectIndex(String name);
     String RecognizeObject(Mat cameraImgGray, Mat cameraImgColour, Mat dstImg);
 
 };

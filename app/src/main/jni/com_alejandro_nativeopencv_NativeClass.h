@@ -31,6 +31,14 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_initRecog
 JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_FindObjects
   (JNIEnv *, jclass, jint, jint, jbyteArray, jintArray);
 
+/*
+ * Class:     com_alejandro_nativeopencv_NativeClass
+ * Method:    doTest
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_alejandro_nativeopencv_NativeClass_doTest
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif

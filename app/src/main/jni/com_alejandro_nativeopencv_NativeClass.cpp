@@ -10,6 +10,8 @@
 #include <features.cpp>
 #include "structures/headers/Object.h"
 #include "structures/headers/Recognizer.h"
+#include "structures/headers/Tester.h"
+#include "structures/headers/TestImage.h"
 
 using namespace std;
 using namespace cv;
@@ -66,6 +68,12 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_initRecog
     /* Adds objects */
     recognizer.createObject("/storage/emulated/0/TFG/Fotos/Carpeta", true);
     recognizer.createObject("/storage/emulated/0/TFG/Fotos/Cereales", true);
+    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Leche", true);
+    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Ariel", true);
+    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Cafe", true);
+    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Celta", true);
+    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Nocilla", true);
+    recognizer.createObject("/storage/emulated/0/TFG/Fotos/Orlando", true);
 
     return true;
 }
@@ -110,4 +118,20 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_FindObjec
     env->ReleaseIntArrayElements(bgra, _bgra, 0);
     env->ReleaseByteArrayElements(yuv, _yuv, 0);
     return true;
+}
+
+JNIEXPORT void JNICALL Java_com_alejandro_nativeopencv_NativeClass_doTest
+        (JNIEnv * env, jclass clazz){
+
+    Tester tester = Tester(recognizer);
+    tester.addImagesFromPath("/storage/emulated/0/TFG/Test");
+
+    long long int totalTime = 0;
+    int iterations = 5;
+
+    for(int i = 0; i < iterations; i++){
+        totalTime = totalTime + tester.doTest();
+    }
+
+    __android_log_print(ANDROID_LOG_DEBUG, "DOTEST()", "Average time %lld", totalTime/5);
 }

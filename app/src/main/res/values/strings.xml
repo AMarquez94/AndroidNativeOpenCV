@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Testing</string>
     <string name="camera_button">Cámara</string>
+    <string name="test_button">Hacer test</string>
 </resources>
