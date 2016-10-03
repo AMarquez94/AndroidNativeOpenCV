@@ -9,7 +9,6 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "TestImage.h"
 #include "Recognizer.h"
-#include <android/log.h>
 
 using namespace std;
 using namespace cv;

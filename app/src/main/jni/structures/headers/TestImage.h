@@ -19,20 +19,23 @@ class TestImage {
 private:
 
     String name;
+    String filename;
     Mat imageColor;
     Mat imageGray;
 public:
 
     /* Constructors */
-    TestImage(String name, Mat imageColor);
+    TestImage(String name, String filename, Mat imageColor);
 
     /* Getters */
     String getName();
+    String getFileName();
     Mat getImageColor();
     Mat getImageGray();
 
     /* Setters */
     void setName(String name);
+    void setFileName(String filename);
     void setImageColor(Mat imageColor);
 };
 

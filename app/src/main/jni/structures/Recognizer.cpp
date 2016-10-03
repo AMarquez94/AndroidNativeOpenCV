@@ -3,10 +3,10 @@
 //
 
 #include "headers/Recognizer.h"
+#include "headers/utils.h"
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <android/log.h>
 
 using namespace std;
 using namespace cv;
@@ -138,13 +138,13 @@ Object Recognizer::createObject(String path, bool add) {
                 /* Object name */
                 name = word;
 
-                __android_log_print(ANDROID_LOG_DEBUG,"NOMBRE","%s",name.c_str());
+                log("NOMBRE", name);
 
             } else if(i == 1){
 
                 /* Object easy or not */
                 easy = (word == "true");
-                __android_log_print(ANDROID_LOG_DEBUG, "EASY", "%d", easy);
+                log("EASY", intToString(easy));
             } else if(i%2 == 0){
 
                 /* Object image view*/
@@ -161,14 +161,14 @@ Object Recognizer::createObject(String path, bool add) {
                 corners[(i/2)-1][1] = cvPoint(image.cols,0);
                 corners[(i/2)-1][2] = cvPoint(image.cols, image.rows);
                 corners[(i/2)-1][3] = cvPoint(0, image.rows);
-                __android_log_print(ANDROID_LOG_DEBUG, "VISTA", "%d", (i/2)-1);
+                log("VISTA", intToString((i/2)-1));
             } else{
 
                 /* Object name view */
                 viewNames.push_back(word);
 
                 String aux = word;
-                __android_log_print(ANDROID_LOG_DEBUG, "VISTA NOMBRE", "%s", aux.c_str());
+                log("VISTA NOMBRE", aux);
             }
 
             i++;

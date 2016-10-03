@@ -6,8 +6,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <android/log.h>
+#include "headers/utils.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -44,7 +43,7 @@ void Tester::addImagesFromPath(String path) {
     ifstream file;
     file.open((path + "/info.txt").c_str());
     if (!file.is_open()){
-        __android_log_print(ANDROID_LOG_ERROR, "TESTER", "Can't open file %s", (path + "/info.txt").c_str());
+        error("TESTER", "Can't open file " + path + "/info.txt");
     } else{
 
         string wordImage, wordName;
@@ -52,9 +51,10 @@ void Tester::addImagesFromPath(String path) {
         {
 
             Mat image = imread(path + "/" + wordImage, CV_LOAD_IMAGE_COLOR);
+            String filename(wordImage);
             file >> wordName;
             String name(wordName);
-            TestImage testImage = TestImage(name, image);
+            TestImage testImage = TestImage(name, filename, image);
             this->images.push_back(testImage);
         }
 
@@ -110,25 +110,15 @@ long long int Tester::doTest() {
     return totalDuration;
 }
 
-String intToString(int number){
-    string Result;//string which will contain the result
-
-    stringstream convert; // stringstream used for the conversion
-
-    convert << number;//add the value of Number to the characters in the stream
-
-    return convert.str();
-}
-
 void printConfusionMatrix(vector <vector <int> > confusionMatrix, vector<Object> objects){
 
-    __android_log_print(ANDROID_LOG_DEBUG, "CONFUSION_MATRIX_START", "===================================================================");
+    log("CONFUSION_MATRIX_START", "===================================================================");
     String aux = "--------";
     /* Get first row (names) */
     for(int i = 0; i < objects.size(); i++){
         aux = aux + " " + objects[i].getName();
     }
-    __android_log_print(ANDROID_LOG_DEBUG, "CONFUSION_MATRIX", "%s", aux.c_str());
+    log("CONFUSION_MATRIX", aux);
 
     /* Print the other rows */
     for(int i = 0; i < confusionMatrix.size(); i++){
@@ -136,7 +126,7 @@ void printConfusionMatrix(vector <vector <int> > confusionMatrix, vector<Object>
         for(int j = 0; j < confusionMatrix[0].size(); j++){
             aux = aux + " - " + intToString(confusionMatrix[i][j]);
         }
-        __android_log_print(ANDROID_LOG_DEBUG, "CONFUSION_MATRIX", "%s", aux.c_str());
+        log("CONFUSION_MATRIX", aux);
     }
-    __android_log_print(ANDROID_LOG_DEBUG, "CONFUSION_MATRIX_END", "=====================================================================");
+    log("CONFUSION_MATRIX_END", "=====================================================================");
 }
