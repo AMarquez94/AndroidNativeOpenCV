@@ -34,7 +34,7 @@ public:
     /* Methods */
     void addImage(TestImage image);
     void addImagesFromPath(String path);
-    long long int doTest();
+    long long int doTest(int iterations);
 };
 
 

@@ -62,52 +62,67 @@ void Tester::addImagesFromPath(String path) {
     }
 }
 
-long long int Tester::doTest() {
+long long int Tester::doTest(int iterations) {
 
-    /* Create confusion matrix */
-    int numObjects = this->recognizer.getObjects().size();
-    vector <vector <int> > confusionMatrix(numObjects);
-    for(int i = 0; i < numObjects; i ++){
-        confusionMatrix[i] = vector <int> (numObjects);
-        for(int j = 0; j < numObjects; j++){
-            confusionMatrix[i][j] = 0;
+    long long int totalTime = 0;
+
+    for(int iter = 0; iter < iterations; iter++){
+
+        /* Create confusion matrix */
+        int numObjects = this->recognizer.getObjects().size();
+        vector <vector <int> > confusionMatrix(numObjects);
+        for(int i = 0; i < numObjects; i ++){
+            confusionMatrix[i] = vector <int> (numObjects);
+            for(int j = 0; j < numObjects; j++){
+                confusionMatrix[i][j] = 0;
+            }
         }
+
+        /* Measuring time */
+        long long int totalDuration = 0.0;
+
+        for(int i = 0; i < this->images.size(); i++){
+
+            Mat aux = Mat(this->images[i].getImageColor().size(), CV_8UC3);
+
+            /* Start measuring time */
+            high_resolution_clock::time_point begin = high_resolution_clock::now();
+
+            /* Recognize the test image */
+            String objectName = recognizer.RecognizeObject(this->images[i].getImageGray(),
+                                                           this->images[i].getImageColor(), aux);
+
+            /* Ends measuring time */
+            high_resolution_clock::time_point end = high_resolution_clock::now();
+
+            /* Added to total time */
+            auto duration = duration_cast<microseconds>( end - begin ).count();
+            totalDuration = totalDuration + duration;
+
+            /* Fill confusion matrix */
+
+            int x = this->recognizer.getObjectIndex(this->images[i].getName());
+            int y = this->recognizer.getObjectIndex(objectName);
+
+            if(y != -1){
+                confusionMatrix[x][y] = confusionMatrix[x][y] + 1;
+            } else{
+                if(iter == iterations - 1){
+                    log("OBJECT NOT FOUND", this->images[i].getFileName());
+                }
+            }
+
+        }
+
+        if(iter == iterations - 1){
+            /* Print confusion matrix */
+            printConfusionMatrix(confusionMatrix, recognizer.getObjects());
+        }
+
+        totalTime = totalTime + totalDuration;
     }
 
-    /* Measuring time */
-    long long int totalDuration = 0.0;
-
-    for(int i = 0; i < this->images.size(); i++){
-
-        Mat aux = Mat(this->images[i].getImageColor().size(), CV_8UC3);
-
-        /* Start measuring time */
-        high_resolution_clock::time_point begin = high_resolution_clock::now();
-
-        /* Recognize the test image */
-        String objectName = recognizer.RecognizeObject(this->images[i].getImageGray(),
-                                                       this->images[i].getImageColor(), aux);
-
-        /* Ends measuring time */
-        high_resolution_clock::time_point end = high_resolution_clock::now();
-
-        /* Added to total time */
-        auto duration = duration_cast<microseconds>( end - begin ).count();
-        totalDuration = totalDuration + duration;
-
-        /* Fill confusion matrix */
-
-        int x = this->recognizer.getObjectIndex(this->images[i].getName());
-        int y = this->recognizer.getObjectIndex(objectName);
-
-        confusionMatrix[x][y] = confusionMatrix[x][y] + 1;
-
-    }
-
-    /* Print confusion matrix */
-    printConfusionMatrix(confusionMatrix, recognizer.getObjects());
-
-    return totalDuration;
+    return totalTime;
 }
 
 void printConfusionMatrix(vector <vector <int> > confusionMatrix, vector<Object> objects){

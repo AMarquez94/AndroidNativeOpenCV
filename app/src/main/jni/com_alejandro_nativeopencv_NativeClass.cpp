@@ -5,9 +5,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
-#include <android/log.h>
-#include <alien.cpp>
-#include <features.cpp>
+#include "structures/headers/utils.h"
 #include "structures/headers/Object.h"
 #include "structures/headers/Recognizer.h"
 #include "structures/headers/Tester.h"
@@ -45,8 +43,7 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_ProcImage
     Mat displayedFrame(mbgra.size(), CV_8UC3);
 
     // Hace el procesamiento de la imagen.
-//    displayedFrame = mbgr;
-      alien(mbgr, displayedFrame, 1);
+    displayedFrame = mbgr;
 
     // Pasa de BGR (formato estandar) a BGRA (formato Android)
     cvtColor(displayedFrame, mbgra, CV_BGR2BGRA);
@@ -130,15 +127,13 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_FindObjec
 JNIEXPORT void JNICALL Java_com_alejandro_nativeopencv_NativeClass_doTest
         (JNIEnv * env, jclass clazz){
 
+    log("TESTER", "Starting tester");
+
     Tester tester = Tester(recognizer);
     tester.addImagesFromPath("/storage/emulated/0/TFG/Test");
 
-    long long int totalTime = 0;
     int iterations = 5;
+    long long int totalTime = tester.doTest(iterations);
 
-    for(int i = 0; i < iterations; i++){
-        totalTime = totalTime + tester.doTest();
-    }
-
-    __android_log_print(ANDROID_LOG_DEBUG, "DOTEST()", "Average time %lld", totalTime/5);
+    log("DOTEST()", "Average time " + longToString(totalTime));
 }
