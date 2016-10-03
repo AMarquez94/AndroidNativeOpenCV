@@ -21,16 +21,19 @@ Recognizer::Recognizer() {
 }
 
 Recognizer::Recognizer(String detector, String extractor, String matcher){
+
     if(detector == "ORB"){
         this->detector = ORB::create();
     } else if(detector == "FAST"){
-        /* TODO: implement */
+        this->detector = FastFeatureDetector::create();
+    } else if(detector == "BRISK"){
+        this->detector = BRISK::create();
     }
 
     if(extractor == "ORB"){
         this->extractor = ORB::create();
     } else if(extractor == "BRISK"){
-        /* TODO: implement */
+        this->extractor = BRISK::create();
     }
 
     this->matcher = DescriptorMatcher::create(matcher);
@@ -41,13 +44,15 @@ Recognizer::Recognizer(String detector, String extractor, String matcher, vector
     if(detector == "ORB"){
         this->detector = ORB::create();
     } else if(detector == "FAST"){
-        /* TODO: implement */
+        this->detector = FastFeatureDetector::create();
+    } else if(detector == "BRISK"){
+        this->detector = BRISK::create();
     }
 
     if(extractor == "ORB"){
         this->extractor = ORB::create();
     } else if(extractor == "BRISK"){
-        /* TODO: implement */
+        this->extractor = BRISK::create();
     }
 
     this->matcher = DescriptorMatcher::create(matcher);
@@ -90,11 +95,13 @@ vector<Object> Recognizer::getObjects() {
 
 /* Setters */
 
-void Recognizer::setDescriptor(String detector) {
+void Recognizer::setDetector(String detector) {
     if(detector == "ORB"){
         this->detector = ORB::create();
     } else if(detector == "FAST"){
-        /* TODO: implement */
+        this->detector = FastFeatureDetector::create();
+    } else if(detector == "BRISK"){
+        this->detector = BRISK::create();
     }
 }
 
@@ -102,7 +109,7 @@ void Recognizer::setExtractor(String extractor) {
     if(extractor == "ORB"){
         this->extractor = ORB::create();
     } else if(extractor == "BRISK"){
-        /* TODO: implement */
+        this->extractor = BRISK::create();
     }
 }
 
@@ -183,6 +190,10 @@ Object Recognizer::createObject(String path, bool add) {
 
         return obj;
     }
+}
+
+void Recognizer::deleteObjects() {
+    this->objects.clear();
 }
 
 int Recognizer::getObjectIndex(String name) {

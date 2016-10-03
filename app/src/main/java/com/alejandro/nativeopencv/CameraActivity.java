@@ -27,6 +27,7 @@ public class CameraActivity extends AppCompatActivity
         //Set this APK Full screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //Set this APK no title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);

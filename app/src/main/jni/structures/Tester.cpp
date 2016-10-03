@@ -72,8 +72,8 @@ long long int Tester::doTest(int iterations) {
         int numObjects = this->recognizer.getObjects().size();
         vector <vector <int> > confusionMatrix(numObjects);
         for(int i = 0; i < numObjects; i ++){
-            confusionMatrix[i] = vector <int> (numObjects);
-            for(int j = 0; j < numObjects; j++){
+            confusionMatrix[i] = vector <int> (numObjects + 1);
+            for(int j = 0; j < numObjects + 1; j++){
                 confusionMatrix[i][j] = 0;
             }
         }
@@ -107,6 +107,7 @@ long long int Tester::doTest(int iterations) {
             if(y != -1){
                 confusionMatrix[x][y] = confusionMatrix[x][y] + 1;
             } else{
+                confusionMatrix[x][numObjects] = confusionMatrix[x][numObjects] + 1;
                 if(iter == iterations - 1){
                     log("OBJECT NOT FOUND", this->images[i].getFileName());
                 }
@@ -122,7 +123,7 @@ long long int Tester::doTest(int iterations) {
         totalTime = totalTime + totalDuration;
     }
 
-    return totalTime;
+    return totalTime/iterations;
 }
 
 void printConfusionMatrix(vector <vector <int> > confusionMatrix, vector<Object> objects){
@@ -133,6 +134,7 @@ void printConfusionMatrix(vector <vector <int> > confusionMatrix, vector<Object>
     for(int i = 0; i < objects.size(); i++){
         aux = aux + " " + objects[i].getName();
     }
+    aux = aux + " No_Recognized";
     log("CONFUSION_MATRIX", aux);
 
     /* Print the other rows */

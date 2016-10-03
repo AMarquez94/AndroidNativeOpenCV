@@ -41,13 +41,14 @@ public:
     vector<Object> getObjects();
 
     /* Setters */
-    void setDescriptor(String detector);
+    void setDetector(String detector);
     void setExtractor(String extractor);
     void setMatcher(String matcher);
     void setObjects(vector<Object> objects);
 
     /* Methods */
     Object createObject(String path, bool add);
+    void deleteObjects();
     int getObjectIndex(String name);
     String RecognizeObject(Mat cameraImgGray, Mat cameraImgColour, Mat dstImg);
 
