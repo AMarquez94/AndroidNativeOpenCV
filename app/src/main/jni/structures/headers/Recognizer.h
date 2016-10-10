@@ -10,6 +10,7 @@
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
 #include "Object.h"
+#include "Result.h"
 
 using namespace std;
 using namespace cv;
@@ -50,7 +51,7 @@ public:
     Object createObject(String path, bool add);
     void deleteObjects();
     int getObjectIndex(String name);
-    String RecognizeObject(Mat cameraImgGray, Mat cameraImgColour, Mat dstImg);
+    Result RecognizeObject(Mat cameraImgGray, Mat cameraImgColour, Mat dstImg);
 
 };
 

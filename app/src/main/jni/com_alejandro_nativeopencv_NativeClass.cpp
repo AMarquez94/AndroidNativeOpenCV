@@ -60,11 +60,9 @@ JNIEXPORT jboolean JNICALL Java_com_alejandro_nativeopencv_NativeClass_initRecog
         (JNIEnv * env, jclass clazz){
 
     /* Creates recognizer */
-    recognizer = Recognizer("ORB","ORB","BruteForce-Hamming");
+    recognizer = Recognizer("FAST","ORB","BruteForce-Hamming");
 
     /* Adds objects */
-    recognizer.createObject("/storage/emulated/0/TFG/BD/Carpeta", true);
-    recognizer.createObject("/storage/emulated/0/TFG/BD/Cereales", true);
     recognizer.createObject("/storage/emulated/0/TFG/BD/Asturiana", true);
     recognizer.createObject("/storage/emulated/0/TFG/BD/Ariel", true);
     recognizer.createObject("/storage/emulated/0/TFG/BD/Cafe", true);
@@ -133,7 +131,7 @@ JNIEXPORT void JNICALL Java_com_alejandro_nativeopencv_NativeClass_doTest
     tester.addImagesFromPath("/storage/emulated/0/TFG/Test");
 
     int iterations = 5;
-    long long int totalTime = tester.doTest(iterations);
+    long long int totalTime = tester.doTest("/storage/emulated/0/TFG/Resultados", iterations);
 
     log("DOTEST()", "Average time " + longToString(totalTime));
 }

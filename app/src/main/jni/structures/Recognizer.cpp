@@ -153,12 +153,12 @@ Object Recognizer::createObject(String path, bool add) {
                 easy = (word == "true");
                 log("EASY", intToString(easy));
             } else if(i%2 == 0){
-
                 /* Object image view*/
                 images.push_back(Mat());
                 keypoints.push_back(vector <KeyPoint>());
                 descriptors.push_back(Mat());
                 corners.push_back(vector <Point2f>(4));
+
 
                 Mat image = imread(path + "/" + word, CV_LOAD_IMAGE_GRAYSCALE);
                 images[(i/2)-1] = image;
@@ -214,7 +214,7 @@ int Recognizer::getObjectIndex(String name) {
     }
 }
 
-String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dstImg){
+Result Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dstImg){
 
 
     /* Extract features from the sceneImage */
@@ -308,6 +308,7 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
     }
 
     String objectName;
+    String viewName;
 
     if(isMatch){
         //-- Draw keypoints
@@ -317,12 +318,14 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
 //            this->objects[bestMatchObject].getViewsNames()[bestMatchView];
 
         objectName = this->objects[bestMatchObject].getName();
+        viewName = this->objects[bestMatchObject].getViewsNames()[bestMatchView];
     }
     else{
 
         /* No match */
         sceneImgColour.copyTo(dstImg);
         objectName = "No object";
+        viewName = "";
     }
 
     /* Write object name */
@@ -330,7 +333,7 @@ String Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
 
     Point org((640 - textsize.width - 20), textsize.height + 20);
     putText( dstImg, objectName, org, FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 2);
-    return objectName;
+    return Result(objectName, viewName, keypointsScene.size(), numberOfMatches);
 }
 
 /**

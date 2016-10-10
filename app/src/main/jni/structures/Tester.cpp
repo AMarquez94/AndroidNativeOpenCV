@@ -13,6 +13,7 @@ using namespace std::chrono;
 using namespace cv;
 
 void printConfusionMatrix(vector <vector <int> > confusionMatrix, vector <Object> objects);
+String writeConfusionMatrix(vector <vector <int> > confusionMatrix, vector <Object> objects);
 
 Tester::Tester(Recognizer recognizer) {
     this->recognizer = recognizer;
@@ -62,11 +63,19 @@ void Tester::addImagesFromPath(String path) {
     }
 }
 
-long long int Tester::doTest(int iterations) {
+long long int Tester::doTest(String path, int iterations) {
+
+    ofstream myfile;
+    myfile.open(path + "/resultados.txt");
 
     long long int totalTime = 0;
+    String matrix = "";
+    int averagePoints = 0;
+    int averageMatches = 0;
 
     for(int iter = 0; iter < iterations; iter++){
+
+        log("TEST", "Iteration " + intToString(iter));
 
         /* Create confusion matrix */
         int numObjects = this->recognizer.getObjects().size();
@@ -81,7 +90,9 @@ long long int Tester::doTest(int iterations) {
         /* Measuring time */
         long long int totalDuration = 0.0;
 
-        for(int i = 0; i < this->images.size(); i++){
+        for(unsigned int i = 0; i < this->images.size(); i++){
+
+            log("TEST", "Image " + intToString(i));
 
             Mat aux = Mat(this->images[i].getImageColor().size(), CV_8UC3);
 
@@ -89,8 +100,10 @@ long long int Tester::doTest(int iterations) {
             high_resolution_clock::time_point begin = high_resolution_clock::now();
 
             /* Recognize the test image */
-            String objectName = recognizer.RecognizeObject(this->images[i].getImageGray(),
-                                                           this->images[i].getImageColor(), aux);
+            Result resultObject = recognizer.RecognizeObject(this->images[i].getImageGray(),
+                                                            this->images[i].getImageColor(), aux);
+//            String objectName = recognizer.RecognizeObject(this->images[i].getImageGray(),
+//                                                           this->images[i].getImageColor(), aux);
 
             /* Ends measuring time */
             high_resolution_clock::time_point end = high_resolution_clock::now();
@@ -102,7 +115,7 @@ long long int Tester::doTest(int iterations) {
             /* Fill confusion matrix */
 
             int x = this->recognizer.getObjectIndex(this->images[i].getName());
-            int y = this->recognizer.getObjectIndex(objectName);
+            int y = this->recognizer.getObjectIndex(resultObject.getObjectName());
 
             if(y != -1){
                 confusionMatrix[x][y] = confusionMatrix[x][y] + 1;
@@ -113,16 +126,29 @@ long long int Tester::doTest(int iterations) {
                 }
             }
 
+            if(iter == iterations - 1){
+                averagePoints = averagePoints + resultObject.getNPoints();
+                averageMatches = averageMatches + resultObject.getNMatches();
+            }
+
         }
 
         if(iter == iterations - 1){
             /* Print confusion matrix */
-            printConfusionMatrix(confusionMatrix, recognizer.getObjects());
+            matrix =  writeConfusionMatrix(confusionMatrix, recognizer.getObjects());
+            averagePoints = averagePoints/this->images.size();
+            averageMatches = averageMatches/this->images.size();
         }
 
         totalTime = totalTime + totalDuration;
     }
 
+
+    myfile << "Tiempo: " << longToString(totalTime/iterations) << endl;
+    myfile << "Media puntos: " << intToString(averagePoints) << endl;
+    myfile << "Media matches buenos: " << intToString(averageMatches) << endl;
+    myfile << matrix;
+    myfile.close();
     return totalTime/iterations;
 }
 
@@ -131,19 +157,38 @@ void printConfusionMatrix(vector <vector <int> > confusionMatrix, vector<Object>
     log("CONFUSION_MATRIX_START", "===================================================================");
     String aux = "--------";
     /* Get first row (names) */
-    for(int i = 0; i < objects.size(); i++){
+    for(unsigned int i = 0; i < objects.size(); i++){
         aux = aux + " " + objects[i].getName();
     }
     aux = aux + " No_Recognized";
     log("CONFUSION_MATRIX", aux);
 
     /* Print the other rows */
-    for(int i = 0; i < confusionMatrix.size(); i++){
+    for(unsigned int i = 0; i < confusionMatrix.size(); i++){
         aux = objects[i].getName();
-        for(int j = 0; j < confusionMatrix[0].size(); j++){
+        for(unsigned int j = 0; j < confusionMatrix[0].size(); j++){
             aux = aux + " - " + intToString(confusionMatrix[i][j]);
         }
         log("CONFUSION_MATRIX", aux);
     }
     log("CONFUSION_MATRIX_END", "=====================================================================");
 }
+
+String writeConfusionMatrix(vector <vector <int> > confusionMatrix, vector<Object> objects){
+    String aux = "";
+    for(unsigned int i = 0; i < objects.size(); i++){
+        aux = aux + objects[i].getName() + " ";
+    }
+    aux = aux + "No_objeto\n";
+
+    /* Print the other rows */
+    for(unsigned int i = 0; i < confusionMatrix.size(); i++){
+        for(unsigned int j = 0; j < confusionMatrix[0].size(); j++){
+            aux = aux + intToString(confusionMatrix[i][j]) + " ";
+        }
+        aux = aux + "\n";
+    }
+
+    return aux;
+}
+
