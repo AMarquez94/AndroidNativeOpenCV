@@ -1,9 +1,9 @@
 //
-// Created by alejandro on 27/09/16.
+// Created by alejandro on 2/11/16.
 //
 
-#ifndef ANDROIDNATIVEOPENCV_OBJECT_H
-#define ANDROIDNATIVEOPENCV_OBJECT_H
+#ifndef UNIZAR_MOBILECV_OBJECT_H
+#define UNIZAR_MOBILECV_OBJECT_H
 
 #include "opencv2/opencv.hpp"
 #include <opencv2/core/core.hpp>
@@ -15,40 +15,31 @@
 using namespace std;
 using namespace cv;
 
-/* TODO: delete images */
-
 class Object {
 
     private:
 
         /* Atribs */
         String name;
-        vector <Mat> viewsImages;
-        vector < vector<KeyPoint> > viewsKeyPoints;
-        vector <Mat> viewsDescriptors;
-        vector < vector<Point2f> > viewsCorners;
         vector < String > viewsNames;
+        vector < String> allergens;
         bool easy;
         bool null;
 
     public:
 
         /* Constructor */
-        Object(bool null);
-        Object(String name, vector <Mat> viewsImages, vector < vector<KeyPoint> > viewsKeyPoints, vector <Mat> viewsDescriptors,
-           vector < vector<Point2f> > viewsCorners, vector < String > viewsNames, bool easy);
+        Object(const bool& null);
+        Object(const String& name, const vector < String >& viewsNames,const vector < String >& allergens, const bool& easy);
 
         /* Methods */
-        String getName();
-        vector <Mat> getViewsImages();
-        vector < vector<KeyPoint> > getViewsKeyPoints();
-        vector < Mat > getViewsDescriptors();
-        vector < vector <Point2f> > getViewsCorners();
-        vector < String > getViewsNames();
-        bool isEasy();
-        bool isNull();
-        int getNumberOfViews();
+        String getName() const;
+        vector < String > getViewsNames() const;
+        vector < String > getAllergens() const;
+        bool isEasy() const;
+        bool isNull() const;
+        int getNumberOfViews() const;
 };
 
 
-#endif //ANDROIDNATIVEOPENCV_OBJECT_H
+#endif //UNIZAR_MOBILECV_OBJECT_H

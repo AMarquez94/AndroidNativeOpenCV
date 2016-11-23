@@ -7,95 +7,111 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <chrono>
 
+using namespace chrono;
 using namespace std;
 using namespace cv;
 
 
 /* Aux methods */
-bool isConvex(vector <Point2f> scene_corners);
+bool isConvex(const vector <Point2f>& scene_corners);
 
 
 Recognizer::Recognizer() {
-
+    this->objects = vector<ObjectKp>();
 }
 
-Recognizer::Recognizer(String detector, String extractor, String matcher){
+Recognizer::Recognizer(const String& detector,const String& extractor,const String& matcher){
 
     if(detector == "ORB"){
-        this->detector = ORB::create();
+        this->detector = ORB::create(/*500, 1.2f, 8, 31, 0, 4*/);
     } else if(detector == "FAST"){
         this->detector = FastFeatureDetector::create();
     } else if(detector == "BRISK"){
-        this->detector = BRISK::create();
+        this->detector = BRISK::create(85);
     }
 
     if(extractor == "ORB"){
-        this->extractor = ORB::create();
+        this->extractor = ORB::create(/*500, 1.2f, 8, 31, 0, 4*/);
     } else if(extractor == "BRISK"){
-        this->extractor = BRISK::create();
+        this->extractor = BRISK::create(85);
     }
 
     this->matcher = DescriptorMatcher::create(matcher);
     this->matcherDistanceFilter = 0.7;
+
+    this->timer = Timer();
+    this->timer.addTime("LOCAL - Extract features");
+    this->timer.addTime("LOCAL - Compare features");
+    this->timer.addTime("LOCAL - Process result");
 }
 
-Recognizer::Recognizer(String detector, String extractor, String matcher, vector<Object> objects){
+Recognizer::Recognizer(const String& detector,const String& extractor,const String& matcher,
+                       const vector<ObjectKp>& objects){
     if(detector == "ORB"){
         this->detector = ORB::create();
     } else if(detector == "FAST"){
         this->detector = FastFeatureDetector::create();
     } else if(detector == "BRISK"){
-        this->detector = BRISK::create();
+        this->detector = BRISK::create(85);
     }
 
     if(extractor == "ORB"){
         this->extractor = ORB::create();
     } else if(extractor == "BRISK"){
-        this->extractor = BRISK::create();
+        this->extractor = BRISK::create(85);
     }
 
     this->matcher = DescriptorMatcher::create(matcher);
     this->matcherDistanceFilter = 0.7;
 
     this->objects = objects;
+
+    this->timer = Timer();
+    this->timer.addTime("LOCAL - Extract features");
+    this->timer.addTime("LOCAL - Compare features");
+    this->timer.addTime("LOCAL - Process result");
 }
 
-Recognizer::Recognizer(String detector, vector<int> detectorParams, String extractor,
-                       vector<int> extractorParams, String matcher, vector<int> matcherParams){
+Recognizer::Recognizer(const String& detector,const vector<float>& detectorParams,const String& extractor,
+                       const vector<float>& extractorParams,const String& matcher,const double& matcherDistance){
+
+    /* ORB: int float int int int int int int int */
+    /* BRISK: int int float */
 
     /* TODO: Implement */
 }
 
-Recognizer::Recognizer(String detector, vector<int> detectorParams, String extractor,
-                       vector<int> extractorParams, String matcher, vector<int> matcherParams,
-                       vector<Object> objects){
+Recognizer::Recognizer(const String& detector,const vector<float>& detectorParams,const String& extractor,
+                       const vector<float>& extractorParams,const String& matcher,const double& matcherDistance,
+                       const vector<ObjectKp>& objects){
 
     /* TODO: Implement */
 }
 
 /* Getters */
 
-Ptr<FeatureDetector> Recognizer::getDescriptor(){
+Ptr<FeatureDetector> Recognizer::getDescriptor() const{
     return this->getDescriptor();
 }
 
 
-Ptr<DescriptorExtractor> Recognizer::getExtractor(){
+Ptr<DescriptorExtractor> Recognizer::getExtractor() const{
     return this->getExtractor();
 }
 
-Ptr<DescriptorMatcher> Recognizer::getMatcher(){
+Ptr<DescriptorMatcher> Recognizer::getMatcher() const{
     return this->getMatcher();
 }
 
-vector<Object> Recognizer::getObjects() {
+vector<ObjectKp> Recognizer::getObjects() const{
     return this->objects;
 }
 
 /* Setters */
 
-void Recognizer::setDetector(String detector) {
+void Recognizer::setDetector(const String& detector) {
     if(detector == "ORB"){
         this->detector = ORB::create();
     } else if(detector == "FAST"){
@@ -105,7 +121,7 @@ void Recognizer::setDetector(String detector) {
     }
 }
 
-void Recognizer::setExtractor(String extractor) {
+void Recognizer::setExtractor(const String& extractor) {
     if(extractor == "ORB"){
         this->extractor = ORB::create();
     } else if(extractor == "BRISK"){
@@ -113,31 +129,34 @@ void Recognizer::setExtractor(String extractor) {
     }
 }
 
-void Recognizer::setMatcher(String matcher) {
+void Recognizer::setMatcher(const String& matcher) {
     this->matcher = DescriptorMatcher::create(matcher);
     this->matcherDistanceFilter = 0.7;
 }
 
-void Recognizer::setObjects(vector <Object> objects) {
+void Recognizer::setObjects(const vector<ObjectKp>& objects) {
     this->objects = objects;
 }
 
-Object Recognizer::createObject(String path, bool add) {
+ObjectKp Recognizer::createObject(const String& path,const bool& add) {
     ifstream file;
     file.open((path + "/info.txt").c_str());
     if (!file.is_open()){
-        return Object(true);
+        return ObjectKp(true);
     } else{
         String name;
-        vector <Mat> images;
         vector < vector<KeyPoint> > keypoints;
         vector <Mat> descriptors;
         vector < vector<Point2f> > corners;
         vector <String> viewNames;
+        vector <String> allergens;
         bool easy;
 
         string word;
         int i = 0;
+
+        int numVistas;
+        int numAllergens;
         while (file >> word)
         {
             if(i == 0){
@@ -152,16 +171,19 @@ Object Recognizer::createObject(String path, bool add) {
                 /* Object easy or not */
                 easy = (word == "true");
                 log("EASY", intToString(easy));
-            } else if(i%2 == 0){
+            } else if(i == 2){
+
+                numVistas = atoi(word.c_str());
+                log("NUM_VISTAS", intToString(numVistas));
+
+            } else if(i < (3 + 2 * numVistas) && i%2 == 1){
                 /* Object image view*/
-                images.push_back(Mat());
                 keypoints.push_back(vector <KeyPoint>());
                 descriptors.push_back(Mat());
                 corners.push_back(vector <Point2f>(4));
 
 
                 Mat image = imread(path + "/" + word, CV_LOAD_IMAGE_GRAYSCALE);
-                images[(i/2)-1] = image;
                 this->detector->detect(image, keypoints[(i/2)-1]);
                 this->extractor->compute(image, keypoints[(i/2)-1], descriptors[(i/2)-1]);
                 corners[(i/2)-1][0] = cvPoint(0,0);
@@ -169,18 +191,22 @@ Object Recognizer::createObject(String path, bool add) {
                 corners[(i/2)-1][2] = cvPoint(image.cols, image.rows);
                 corners[(i/2)-1][3] = cvPoint(0, image.rows);
                 log("VISTA", intToString((i/2)-1));
-            } else{
+            } else if(i < (3 + 2 * numVistas) && i%2 == 0){
 
                 /* Object name view */
                 viewNames.push_back(word);
 
                 String aux = word;
                 log("VISTA NOMBRE", aux);
+            } else{
+                allergens.push_back(word);
+                String aux = word;
+                log("ALERGENO", aux);
             }
 
             i++;
         }
-        Object obj = Object(name, images, keypoints, descriptors, corners, viewNames, easy);
+        ObjectKp obj = ObjectKp(name, keypoints, descriptors, corners, viewNames, allergens, easy);
 
         if(add){
             this->objects.push_back(obj);
@@ -196,7 +222,7 @@ void Recognizer::deleteObjects() {
     this->objects.clear();
 }
 
-int Recognizer::getObjectIndex(String name) {
+int Recognizer::getObjectIndex(const String& name) {
     int i = 0;
     bool found = false;
     while(i < this->objects.size() && !found){
@@ -214,8 +240,9 @@ int Recognizer::getObjectIndex(String name) {
     }
 }
 
-Result Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dstImg){
+Result Recognizer::recognizeObject(const Mat& sceneImgGray,const Mat& sceneImgColour, Mat dstImg){
 
+    high_resolution_clock::time_point beginExtracting = high_resolution_clock::now();
 
     /* Extract features from the sceneImage */
     vector<KeyPoint> keypointsScene;
@@ -223,7 +250,16 @@ Result Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
     this->detector->detect(sceneImgGray, keypointsScene);
     this->extractor->compute(sceneImgGray, keypointsScene, descriptorsScene);
 
+    /* Ends measuring time */
+    high_resolution_clock::time_point endExtracting = high_resolution_clock::now();
+
+    /* Added to total time */
+    auto durationExtracting = duration_cast<microseconds>( endExtracting - beginExtracting ).count();
+    this->timer.addDuration("LOCAL - Extract features", durationExtracting);
+
     /* Extract the matches between the cameraImage and all the objects in the object list */
+
+    high_resolution_clock::time_point beginMatching = high_resolution_clock::now();
 
     /* Data structures */
     vector < vector< vector<KeyPoint> > >matchedObjects, matchedScene;
@@ -278,7 +314,18 @@ Result Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
         }
     }
 
+    /* Ends measuring time */
+    high_resolution_clock::time_point endMatching = high_resolution_clock::now();
+
+    /* Added to total time */
+    auto durationMatching = duration_cast<microseconds>( endMatching - beginMatching ).count();
+    this->timer.addDuration("LOCAL - Compare features", durationMatching);
+
+    high_resolution_clock::time_point beginProcessing = high_resolution_clock::now();
+
     bool isMatch = false;
+
+    vector<Point2f> scene_corners;
 
     if(bestMatchObject!=-1 && bestMatchView!=-1 && matchedScene[bestMatchObject][bestMatchView].size() >= 4){
 
@@ -287,7 +334,7 @@ Result Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
 
         if(!H.empty()){
             //Corners Object
-            vector<Point2f> scene_corners(4);
+            scene_corners = vector<Point2f>(4);
 
             perspectiveTransform(this->objects[bestMatchObject].getViewsCorners()[bestMatchView], scene_corners, H);
 
@@ -309,6 +356,7 @@ Result Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
 
     String objectName;
     String viewName;
+    vector <String> allergens;
 
     if(isMatch){
         //-- Draw keypoints
@@ -319,6 +367,7 @@ Result Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
 
         objectName = this->objects[bestMatchObject].getName();
         viewName = this->objects[bestMatchObject].getViewsNames()[bestMatchView];
+        allergens = this->objects[bestMatchObject].getAllergens();
     }
     else{
 
@@ -326,21 +375,38 @@ Result Recognizer::RecognizeObject(Mat sceneImgGray, Mat sceneImgColour, Mat dst
         sceneImgColour.copyTo(dstImg);
         objectName = "No object";
         viewName = "";
+        allergens = vector<String>(0);
     }
 
     /* Write object name */
     Size textsize = getTextSize(objectName, FONT_HERSHEY_COMPLEX, 1, 2, 0);
 
     Point org((640 - textsize.width - 20), textsize.height + 20);
-    putText( dstImg, objectName, org, FONT_HERSHEY_COMPLEX, 1, Scalar(0, 0, 255), 2);
-    return Result(objectName, viewName, keypointsScene.size(), numberOfMatches);
+    putText( dstImg, objectName, org, FONT_HERSHEY_COMPLEX, 1, Scalar(0, 255, 0), 2);
+
+    for(int i = 0; i < allergens.size(); i++){
+        textsize = getTextSize(allergens[i], FONT_HERSHEY_COMPLEX, 0.75, 2, 0);
+        Point org((640 - textsize.width - 20), textsize.height + 20 + 30*(i+1));
+
+        /* Comprobar con lista de alergenos para pintar de verde o de rojo */
+        putText( dstImg, allergens[i], org, FONT_HERSHEY_COMPLEX, 0.75, Scalar(0, 0, 255), 2);
+    }
+
+    /* Ends measuring time */
+    high_resolution_clock::time_point endProcessing = high_resolution_clock::now();
+
+    /* Added to total time */
+    auto durationProcessing = duration_cast<microseconds>( endProcessing - beginProcessing ).count();
+    this->timer.addDuration("LOCAL - Process result", durationProcessing);
+
+    return Result(objectName, viewName, keypointsScene.size(), numberOfMatches, scene_corners, allergens);
 }
 
 /**
  *
  * Return true if the cuadrilateral formed by the scene_corners is convex
  */
-bool isConvex(vector <Point2f> scene_corners){
+bool isConvex(const vector <Point2f>& scene_corners){
 
     bool sign = false;
     bool convex = true;
@@ -363,6 +429,10 @@ bool isConvex(vector <Point2f> scene_corners){
     }
 
     return convex;
+}
+
+void Recognizer::printTimer() {
+    this->timer.printTimes();
 }
 
 

@@ -8,6 +8,7 @@
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "ProtoResult.pb.h"
 
 using namespace std;
 using namespace cv;
@@ -19,14 +20,25 @@ private:
     String viewName;
     int nPoints;
     int nMatches;
+    vector<Point2f> corners;
+    vector<String> allergens;
 
 public:
 
-    Result(String objectName, String viewName, int nPoints, int nMatches);
-    String getObjectName();
-    String getViewName();
-    int getNPoints();
-    int getNMatches();
+    Result();
+    Result(const String& objectName,const String& viewName,const int& nPoints,const int& nMatches,
+           const vector<Point2f>& corners,const vector<String>& allergens);
+    String getObjectName() const;
+    String getViewName() const;
+    int getNPoints() const;
+    int getNMatches() const;
+    vector<Point2f> getCorners() const;
+    vector<String> getAllergens() const;
+    bool serializeResult(string* output);
+    bool deserializeResult(const string& data);
+
+//    bool SerializeToString(string* output) const;
+//    bool ParseFromString(const string& data);
 
 };
 

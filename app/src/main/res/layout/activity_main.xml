@@ -8,20 +8,59 @@
     tools:context=".MainActivity">
 
     <TextView android:id="@+id/testTextView"
-        android:layout_marginTop="16dp"
-        android:text="Hello World!"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="6dp"
+        android:text="@string/reconocedor"
+        android:textSize="18dp"
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/camera_button"
-        android:id="@+id/camera_button"/>
+        android:orientation="horizontal">
 
-    <Button
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/camera_button"
+            android:id="@+id/camera_button"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remote_button"
+            android:id="@+id/remote_button"/>
+
+    </LinearLayout>
+
+    <TextView android:id="@id/testTextView"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="6dp"
+        android:text="@string/test"
+        android:textSize="18dp"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/test_button"
-        android:id="@+id/test_button"/>
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/test_button"
+            android:id="@+id/test_button"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/testRemote_button"
+            android:id="@+id/testRemote_button"/>
+
+    </LinearLayout>
+
 </LinearLayout>

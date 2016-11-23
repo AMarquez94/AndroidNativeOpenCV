@@ -9,8 +9,9 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
-#include "Object.h"
+#include "ObjectKp.h"
 #include "Result.h"
+#include "Timer.h"
 
 using namespace std;
 using namespace cv;
@@ -21,37 +22,40 @@ private:
     Ptr<FeatureDetector> detector;
     Ptr<DescriptorExtractor> extractor;
     Ptr<DescriptorMatcher> matcher;
-    vector<Object> objects;
+    vector<ObjectKp> objects;
     double matcherDistanceFilter;
+    Timer timer;
 public:
 
     /* Constructors */
     Recognizer();
-    Recognizer(String detector, String extractor, String matcher);
-    Recognizer(String detector, String extractor, String matcher, vector<Object> objects);
-    Recognizer(String detector, vector<int> detectorParams, String extractor,
-               vector<int> extractorParams, String matcher, vector<int> matcherParams);
-    Recognizer(String detector, vector<int> detectorParams, String extractor,
-               vector<int> extractorParams, String matcher, vector<int> matcherParams,
-               vector<Object> objects);
+    Recognizer(const String& detector,const String& extractor,const String& matcher);
+    Recognizer(const String& detector,const String& extractor,const String& matcher,
+               const vector<ObjectKp>& objects);
+    Recognizer(const String& detector,const vector<float>& detectorParams,const String& extractor,
+               const vector<float>& extractorParams,const String& matcher,const double& matcherDistance);
+    Recognizer(const String& detector,const vector<float>& detectorParams,const String& extractor,
+               const vector<float>& extractorParams,const String& matcher,const double& matcherDistance,
+               const vector<ObjectKp>& objects);
 
     /* Getters */
-    Ptr<FeatureDetector> getDescriptor();
-    Ptr<DescriptorExtractor> getExtractor();
-    Ptr<DescriptorMatcher> getMatcher();
-    vector<Object> getObjects();
+    Ptr<FeatureDetector> getDescriptor() const;
+    Ptr<DescriptorExtractor> getExtractor() const;
+    Ptr<DescriptorMatcher> getMatcher() const;
+    vector<ObjectKp> getObjects() const;
 
     /* Setters */
-    void setDetector(String detector);
-    void setExtractor(String extractor);
-    void setMatcher(String matcher);
-    void setObjects(vector<Object> objects);
+    void setDetector(const String& detector);
+    void setExtractor(const String& extractor);
+    void setMatcher(const String& matcher);
+    void setObjects(const vector<ObjectKp>& objects);
 
     /* Methods */
-    Object createObject(String path, bool add);
+    ObjectKp createObject(const String& path,const bool& add);
     void deleteObjects();
-    int getObjectIndex(String name);
-    Result RecognizeObject(Mat cameraImgGray, Mat cameraImgColour, Mat dstImg);
+    int getObjectIndex(const String& name);
+    Result recognizeObject(const Mat& sceneImgGray,const Mat& sceneImgColour, Mat dstImg);
+    void printTimer();
 
 };
 

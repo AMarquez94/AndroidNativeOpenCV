@@ -1,4 +1,4 @@
-package com.alejandro.nativeopencv;
+package com.alejandro.unizar_mobilecv;
 
 import org.junit.Test;
 

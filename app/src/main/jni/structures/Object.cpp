@@ -1,64 +1,42 @@
 //
-// Created by alejandro on 27/09/16.
+// Created by alejandro on 2/11/16.
 //
 
 #include "headers/Object.h"
 
-using namespace std;
-using namespace cv;
-
-Object::Object(bool null) {
+Object::Object(const bool &null) {
     this->null = null;
 }
 
-Object::Object(String name, vector<Mat> viewsImages, vector < vector<KeyPoint> > viewsKeyPoints, vector <Mat> viewsDescriptors,
-               vector < vector<Point2f> > viewsCorners, vector <String> viewsName, bool easy){
+Object::Object(const String &name, const vector <String> &viewsNames,
+               const vector <String> &allergens, const bool &easy) {
     this->name = name;
-    this->viewsImages = viewsImages;
-    this->viewsKeyPoints = viewsKeyPoints;
-    this->viewsDescriptors = viewsDescriptors;
-    this->viewsCorners = viewsCorners;
-    this->viewsNames = viewsName;
+    this->viewsNames = viewsNames;
+    this->allergens = allergens;
     this->easy = easy;
     this->null = false;
-
-    /* TODO: init views_name */
 }
 
-String Object::getName(){
+String Object::getName() const {
     return this->name;
 }
 
-vector < Mat > Object::getViewsImages() {
-    return this->viewsImages;
-}
-
-vector < vector<KeyPoint> > Object::getViewsKeyPoints(){
-    return this->viewsKeyPoints;
-}
-
-vector < Mat > Object::getViewsDescriptors(){
-    return this->viewsDescriptors;
-}
-
-vector < vector <Point2f> > Object::getViewsCorners(){
-    return this->viewsCorners;
-}
-
-vector < String > Object::getViewsNames() {
+vector < String > Object::getViewsNames() const {
     return this->viewsNames;
 }
 
-bool Object::isEasy(){
+vector < String > Object::getAllergens() const{
+    return this->allergens;
+}
+
+bool Object::isEasy() const{
     return this->easy;
 }
 
-bool Object::isNull(){
+bool Object::isNull() const{
     return this->null;
 }
 
-int Object::getNumberOfViews(){
-    return this->getViewsKeyPoints().size();
+int Object::getNumberOfViews() const{
+    return this->getViewsNames().size();
 }
-
-/* TODO: get views_name */

@@ -12,13 +12,15 @@
 using namespace std;
 using namespace cv;
 
-String intToString(int number);
+String intToString(const int& number);
 
-String longToString(long long int number);
+String longToString(const long long int& number);
 
-void log(String tag, String text);
+String floatToString(const float& number);
 
-void error(String tag, String text);
+void log(const String& tag, const String& text);
+
+void error(const String& tag,const String& text);
 
 
 

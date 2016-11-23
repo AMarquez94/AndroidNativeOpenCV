@@ -1,5 +1,10 @@
 <resources>
-    <string name="app_name">Testing</string>
+    <string name="test">Hacer test</string>
+    <string name="reconocedor">Reconocedor</string>
+    <string name="app_name">Unizar Mobile CV</string>
     <string name="camera_button">Cámara</string>
-    <string name="test_button">Hacer test</string>
+    <string name="remote_button">Remoto</string>
+    <string name="test_button">Local</string>
+    <string name="testRemote_button">Remoto</string>
+
 </resources>

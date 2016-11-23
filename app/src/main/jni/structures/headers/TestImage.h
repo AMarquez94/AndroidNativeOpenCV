@@ -25,18 +25,18 @@ private:
 public:
 
     /* Constructors */
-    TestImage(String name, String filename, Mat imageColor);
+    TestImage(const String& name, const String& filename, const Mat& imageColor);
 
     /* Getters */
-    String getName();
-    String getFileName();
-    Mat getImageColor();
-    Mat getImageGray();
+    String getName() const;
+    String getFileName() const;
+    Mat getImageColor() const;
+    Mat getImageGray() const;
 
     /* Setters */
-    void setName(String name);
-    void setFileName(String filename);
-    void setImageColor(Mat imageColor);
+    void setName(const String& name);
+    void setFileName(const String& filename);
+    void setImageColor(const Mat& imageColor);
 };
 
 

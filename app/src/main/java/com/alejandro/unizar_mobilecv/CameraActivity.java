@@ -1,5 +1,6 @@
-package com.alejandro.nativeopencv;
+package com.alejandro.unizar_mobilecv;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -19,6 +20,12 @@ public class CameraActivity extends AppCompatActivity
     private FrameLayout mainLayout;
     private int previewSizeWidth;
     private int previewSizeHeight;
+    private boolean local;
+
+    static {
+        System.loadLibrary("gnustl_shared");
+        System.loadLibrary("ProcImage");
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -30,7 +37,7 @@ public class CameraActivity extends AppCompatActivity
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //Set this APK no title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main);
+        setContentView(R.layout.camera);
 
         //
         // Create my camera preview
@@ -52,7 +59,14 @@ public class CameraActivity extends AppCompatActivity
         this.previewSizeHeight = 480;
         this.previewSizeWidth = 640;
 
-        camPreview = new CameraPreview(previewSizeWidth, previewSizeHeight, MyCameraPreview);
+        Intent intent = getIntent();
+        local = intent.getBooleanExtra("LOCAL", true);
+
+        if(!local){
+            NativeClass.startClient();
+        }
+
+        camPreview = new CameraPreview(previewSizeWidth, previewSizeHeight, MyCameraPreview, local);
 
         camHolder.addCallback(camPreview);
         camHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -66,6 +80,43 @@ public class CameraActivity extends AppCompatActivity
     {
         if ( camPreview != null)
             camPreview.onPause();
+        if(!local){
+            NativeClass.endClient();
+        }
         super.onPause();
     }
+
+    @Override
+    protected void onResume(){
+        if(!local) {
+            NativeClass.startClient();
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop(){
+        if(!local){
+            NativeClass.endClient();
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart(){
+        if(!local) {
+            NativeClass.startClient();
+        }
+        super.onStart();
+    }
+
+    @Override
+    protected void onDestroy(){
+        if(!local){
+            NativeClass.endClient();
+        }
+        super.onDestroy();
+    }
+
+
 }

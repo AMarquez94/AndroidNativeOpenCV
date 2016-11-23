@@ -6,7 +6,7 @@ android {
     buildToolsVersion "24.0.2"
 
     defaultConfig {
-        applicationId "com.alejandro.nativeopencv"
+        applicationId "com.alejandro.unizar_mobilecv"
         minSdkVersion 14
         targetSdkVersion 24
         versionCode 1
@@ -28,9 +28,9 @@ android {
 //    task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
 //        commandLine "$ndkDir/ndk-build",
 //                'NDK_PROJECT_PATH=build/intermediates/ndk',
-//                'NDK_LIBS_OUT=src/main/jniLibs',
-//                'APP_BUILD_SCRIPT=src/main/jni/Android.mk',
-//                'NDK_APPLICATION_MK=src/main/jni/Application.mk'
+//                'NDK_LIBS_OUT=src/camera/jniLibs',
+//                'APP_BUILD_SCRIPT=src/camera/jni/Android.mk',
+//                'NDK_APPLICATION_MK=src/camera/jni/Application.mk'
 //    }
 //
 //    tasks.withType(JavaCompile) {

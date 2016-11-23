@@ -9,6 +9,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "TestImage.h"
 #include "Recognizer.h"
+#include "Network.h"
 
 using namespace std;
 using namespace cv;
@@ -21,20 +22,21 @@ private:
 public:
 
     /* Constructors */
-    Tester(Recognizer recognizer);
+    Tester(const Recognizer& recognizer);
 
     /* Getters */
-    Recognizer getRecognizer();
-    vector<TestImage> getTestImages();
+    Recognizer getRecognizer() const;
+    vector<TestImage> getTestImages() const;
 
     /* Setters */
-    void setRecognizer(Recognizer recognizer);
-    void setImages(vector<TestImage> images);
+    void setRecognizer(const Recognizer& recognizer);
+    void setImages(const vector<TestImage>& images);
 
     /* Methods */
-    void addImage(TestImage image);
-    void addImagesFromPath(String path);
-    long long int doTest(String path, int iterations);
+    void addImage(const TestImage& image);
+    void addImagesFromPath(const String& path);
+    long long int doTest(const String& path, const int& iterations);
+    long long int doTestRemote(const String& path, const int& iterations, Network network);
 };
 
 

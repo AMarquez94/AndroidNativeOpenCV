@@ -1,4 +1,4 @@
-package com.alejandro.nativeopencv;
+package com.alejandro.unizar_mobilecv;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

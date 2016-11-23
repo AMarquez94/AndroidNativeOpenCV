@@ -1,4 +1,4 @@
-package com.alejandro.nativeopencv;
+package com.alejandro.unizar_mobilecv;
 
 import java.io.IOException;
 
@@ -23,18 +23,21 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
     private int imageFormat;
     private int PreviewSizeWidth;
     private int PreviewSizeHeight;
+    private boolean local;
     private boolean bProcessing = false;
+    private int iterations = 0;
 
     Handler mHandler = new Handler(Looper.getMainLooper());
 
     public CameraPreview(int PreviewlayoutWidth, int PreviewlayoutHeight,
-                         ImageView CameraPreview)
+                         ImageView CameraPreview, boolean local)
     {
         PreviewSizeWidth = PreviewlayoutWidth;
         PreviewSizeHeight = PreviewlayoutHeight;
         MyCameraPreview = CameraPreview;
         bitmap = Bitmap.createBitmap(PreviewSizeWidth, PreviewSizeHeight, Bitmap.Config.ARGB_8888);
         pixels = new int[PreviewSizeWidth * PreviewSizeHeight];
+        this.local = local;
     }
 
     @Override
@@ -105,7 +108,26 @@ public class CameraPreview implements SurfaceHolder.Callback, Camera.PreviewCall
         {
             Log.i("MyImageProcessing", "DoImageProcessing():");
             bProcessing = true;
-            NativeClass.FindObjects(PreviewSizeWidth, PreviewSizeHeight, FrameData, pixels);
+            iterations++;
+            if(local){
+                if(iterations <= 100){
+                    NativeClass.FindObjects(PreviewSizeWidth, PreviewSizeHeight, FrameData, pixels);
+                } else{
+                    if(iterations == 101){
+                        NativeClass.showStats();
+                    }
+                    NativeClass.ProcImage(PreviewSizeWidth, PreviewSizeHeight, FrameData, pixels);
+                }
+            } else {
+                if(iterations <= 100){
+                    NativeClass.sendRemote(PreviewSizeWidth, PreviewSizeHeight, FrameData, pixels);
+                } else{
+                    if(iterations == 101){
+                        NativeClass.showStats();
+                    }
+                    NativeClass.ProcImage(PreviewSizeWidth, PreviewSizeHeight, FrameData, pixels);
+                }
+            }
 
             bitmap.setPixels(pixels, 0, PreviewSizeWidth, 0, 0, PreviewSizeWidth, PreviewSizeHeight);
             MyCameraPreview.setImageBitmap(bitmap);

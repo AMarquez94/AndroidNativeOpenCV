@@ -7,7 +7,7 @@
 using namespace std;
 using namespace cv;
 
-String intToString(int number){
+String intToString(const int& number){
     string Result;//string which will contain the result
 
     stringstream convert; // stringstream used for the conversion
@@ -17,7 +17,7 @@ String intToString(int number){
     return convert.str();
 }
 
-String longToString(long long int number){
+String longToString(const long long int& number){
     string Result;
 
     stringstream convert;
@@ -27,10 +27,20 @@ String longToString(long long int number){
     return convert.str();
 }
 
-void log(String tag, String text){
+String floatToString(const float& number){
+    string Result;
+
+    stringstream convert;
+
+    convert << number;
+
+    return convert.str();
+}
+
+void log(const String& tag, const String& text){
     __android_log_print(ANDROID_LOG_DEBUG, tag.c_str(), text.c_str());
 }
 
-void error(String tag, String text){
+void error(const String& tag, const String& text){
     __android_log_print(ANDROID_LOG_ERROR, tag.c_str(), text.c_str());
 }
